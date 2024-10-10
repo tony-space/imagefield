@@ -23,6 +23,7 @@ set(SRC
 	include/imf/core/node/PlaceholderNode.hpp
 	include/imf/core/node/SinkNode.hpp
 
+	include/imf/core/core.hpp
 	include/imf/core/DataFlow.hpp
 	include/imf/core/GraphNode.hpp
 	include/imf/core/GraphNodeFactory.hpp

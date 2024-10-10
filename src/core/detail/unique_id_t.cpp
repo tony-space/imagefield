@@ -1,5 +1,3 @@
-#include <atomic>
-
 #include <imf/core/unique_id_t.hpp>
 
 namespace imf::core
