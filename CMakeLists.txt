@@ -3,10 +3,12 @@ cmake_minimum_required(VERSION 3.22.1)
 project(ImageField)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+option(IMF_USE_PRECOMPILED_HEADERS "Use precompiled headers" ON)
 option(IMF_CPU_BACKEND "Enable CPU backend" ON)
 option(IMF_OPENGL_BACKEND "Enable OpenGL backend" ON)
 option(IMF_SANDBOXES "Enable sandboxes" ON)
 
+MESSAGE(STATUS "Generating precompiled headers: " ${IMF_USE_PRECOMPILED_HEADERS})
 MESSAGE(STATUS "Generating CPU backend: " ${IMF_OPENGL_BACKEND})
 MESSAGE(STATUS "Generating OpenGL backend: " ${IMF_OPENGL_BACKEND})
 MESSAGE(STATUS "Generating sandboxes: " ${IMF_SANDBOXES})

@@ -2,6 +2,8 @@
 
 #include <imf/core/unique_id_t.hpp>
 
+#include <memory>
+
 namespace imf::core
 {
 

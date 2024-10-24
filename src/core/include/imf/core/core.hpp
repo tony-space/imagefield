@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <functional>
+#include <stdexcept>
 
 #include <boost/range/iterator_range.hpp>
 

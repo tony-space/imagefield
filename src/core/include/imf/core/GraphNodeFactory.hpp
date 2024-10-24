@@ -1,5 +1,9 @@
 #pragma once
 
+#include <functional>
+#include <memory>
+#include <string_view>
+
 namespace imf::core
 {
 
