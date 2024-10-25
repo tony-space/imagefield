@@ -1,10 +1,13 @@
 #include <imf/core/node/PlaceholderNode.hpp>
 
+#include <boost/container_hash/hash.hpp>
+
 namespace imf::core
 {
 
 PlaceholderNode::PlaceholderNode(TypeQualifier qualifier, TypeID typeId) :
 	m_output(this, std::move(typeId)),
+	m_value_hash(std::hash<unique_id_t>{}(make_unique_id())),
 	m_qualifier(qualifier)
 {
 
@@ -44,7 +47,12 @@ iterator_range<const DataFlow*> PlaceholderNode::outputs() const noexcept
 
 GraphNode::hast_t PlaceholderNode::hash() const noexcept
 {
-	return hast_t();
+	GraphNode::hast_t result = 0;
+
+	boost::hash_combine(result, std::hash<TypeID>{}(m_output.dataType()));
+	boost::hash_combine(result, m_value_hash);
+
+	return result;
 }
 
 }

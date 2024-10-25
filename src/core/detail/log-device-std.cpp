@@ -10,7 +10,7 @@ namespace TerminalColors
 	constexpr static std::string_view Reset = "\033[0m";
 	//constexpr static std::string_view Black = "\033[30m";
 	constexpr static std::string_view Red = "\033[31m";
-	constexpr static std::string_view Green = "\033[32m";
+	//constexpr static std::string_view Green = "\033[32m";
 	//constexpr static std::string_view Yellow = "\033[33m";
 	//constexpr static std::string_view Blue = "\033[34m";
 	//constexpr static std::string_view Magenta = "\033[35m";
@@ -18,7 +18,7 @@ namespace TerminalColors
 	//constexpr static std::string_view White = "\033[37m";
 	//constexpr static std::string_view BoldBlack = "\033[1m\033[30m";
 	//constexpr static std::string_view BoldRed = "\033[1m\033[31m";
-	//constexpr static std::string_view BoldGreen = "\033[1m\033[32m";
+	constexpr static std::string_view BoldGreen = "\033[1m\033[32m";
 	//constexpr static std::string_view BoldYellow = "\033[1m\033[33m";
 	//constexpr static std::string_view BoldBlue = "\033[1m\033[34m";
 	constexpr static std::string_view BoldMagenta = "\033[1m\033[35m";
@@ -61,10 +61,8 @@ log_stream& info(std::string_view tag)
 {
 	static log_stream infoStream{ iostream_device() };
 
-	iostream_device().write(TerminalColors::Green.data(), TerminalColors::Green.size());
-	infoStream << "\n[" << tag << "] ";
-	iostream_device().write(TerminalColors::Reset.data(), TerminalColors::Reset.size());
-
+	infoStream << TerminalColors::BoldGreen << "\n[" << tag << "]\t" << TerminalColors::Reset;
+	
 	return infoStream;
 }
 
@@ -72,9 +70,7 @@ log_stream& err(std::string_view tag)
 {
 	static log_stream errStream{ iostream_device() };
 
-	iostream_device().write(TerminalColors::Red.data(), TerminalColors::Red.size());
-	errStream << "\n[" << tag << "] ";
-	iostream_device().write(TerminalColors::Reset.data(), TerminalColors::Reset.size());
+	errStream << TerminalColors::Red << "\n[" << tag << "]\t" << TerminalColors::Reset;
 
 	return errStream;
 }

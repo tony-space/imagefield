@@ -26,8 +26,8 @@ public:
 	const TypeID& dataType() const noexcept;
 
 	std::shared_ptr<const DataFlow> sharedPtr() const noexcept;
-private:
 
+private:
 	GraphNode* m_producer;
 	unique_id_t m_id{ make_unique_id() };
 	TypeID m_dataType;
