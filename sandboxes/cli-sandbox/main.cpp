@@ -1,6 +1,4 @@
-#include <imf/core/GraphNode.hpp>
-#include <imf/core/GraphNodeFactory.hpp>
-#include <imf/core/log.hpp>
+#include <imf/core/core.hpp>
 
 int main()
 {
@@ -15,10 +13,8 @@ int main()
 			return nullptr;
 		});
 
-		register_graph_node("hello", []() -> std::shared_ptr<GraphNode>
-		{
-			return nullptr;
-		});
+		auto placeholder = PlaceholderNode::make(TypeQualifier::Constant, 3.14f);
+		auto flow = placeholder->outputs().front().sharedPtr();
 	}
 	catch (const std::exception& ex)
 	{

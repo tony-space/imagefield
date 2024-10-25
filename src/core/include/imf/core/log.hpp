@@ -1,7 +1,9 @@
 #pragma once
 
 #include <functional>
+#include <string>
 #include <string_view>
+#include <type_traits>
 
 namespace imf::core::log
 {
@@ -33,10 +35,13 @@ public:
 
 	log_stream& operator<< (char);
 	log_stream& operator<< (std::string_view message);
+	template<typename T, std::enable_if_t<std::is_arithmetic_v<T>, bool> = true> log_stream& operator<< (T value)
+	{
+		return *this << std::to_string(value);
+	}
 private:
 	IDevice& m_device;
 };
-
 
 log_stream& info(std::string_view tag);
 log_stream& err(std::string_view tag);

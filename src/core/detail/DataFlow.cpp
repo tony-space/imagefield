@@ -4,7 +4,7 @@
 namespace imf::core
 {
 
-DataFlow::DataFlow(GraphNode* _producer, unique_id_t _type) :
+DataFlow::DataFlow(GraphNode* _producer, TypeID _type) :
 	m_producer(_producer),
 	m_dataType(std::move(_type))
 {
@@ -25,9 +25,14 @@ std::shared_ptr<const GraphNode> DataFlow::producer() const noexcept
 	return m_producer->shared_from_this();
 }
 
-unique_id_t DataFlow::dataType() const noexcept
+const TypeID& DataFlow::dataType() const noexcept
 {
 	return m_dataType;
+}
+
+std::shared_ptr<const DataFlow> DataFlow::sharedPtr() const noexcept
+{
+	return { m_producer->shared_from_this(), this };
 }
 
 }
