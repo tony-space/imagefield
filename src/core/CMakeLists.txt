@@ -2,11 +2,6 @@ cmake_minimum_required(VERSION 3.22.1)
 
 #find_package(Threads REQUIRED)
 
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
-set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
-find_package(Boost REQUIRED)
-
 project(IMFCore LANGUAGES CXX)
 
 set(SRC
@@ -54,7 +49,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE IMF_CXX_FLAGS)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
 #	Threads::Threads
-	Boost::boost
+	Boost::range
 )
 
 # if(CMAKE_SYSTEM_NAME STREQUAL Android)

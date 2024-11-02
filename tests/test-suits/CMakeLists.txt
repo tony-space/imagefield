@@ -23,7 +23,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER tests)
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE IMF_CXX_FLAGS)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${ImageField})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${ImageField} Boost::included_unit_test_framework)
 
 target_link_options(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/WHOLEARCHIVE:${PROJECT_NAME}>)
 target_link_options(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:AppleClang>:-Wl,-all_load>)
