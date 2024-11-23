@@ -6,11 +6,12 @@
 #include <imf/core/TypeID.hpp>
 
 #include <any>
+#include <optional>
 
 namespace imf::core
 {
 
-class PlaceholderNode : public GraphNode
+class PlaceholderNode final : public GraphNode
 {
 public:
 	constexpr static std::string_view operation_type = "Placeholder";
@@ -22,13 +23,13 @@ public:
 	PlaceholderNode& operator=(const PlaceholderNode&) = delete;
 	PlaceholderNode& operator=(PlaceholderNode&&) noexcept = delete;
 
-	std::string_view operationName() const noexcept override final;
-	iterator_range<const std::string_view*> inputNames() const noexcept override final;
-	iterator_range<const TypeID*> inputTypes() const noexcept override final;
-	iterator_range<const std::string_view*> outputNames() const noexcept override final;
-	iterator_range<const TypeID*> outputTypes() const noexcept override final;
-	iterator_range<const DataFlow*> outputs() const noexcept override final;
-	hast_t hash() const noexcept override final;
+	std::string_view operationName() const noexcept override;
+	iterator_range<const std::string_view*> inputNames() const noexcept override;
+	iterator_range<const TypeID*> inputTypes() const noexcept override;
+	iterator_range<const std::string_view*> outputNames() const noexcept override;
+	iterator_range<const TypeID*> outputTypes() const noexcept override;
+	iterator_range<const DataFlow*> outputs() const noexcept override;
+	hast_t hash() const noexcept override;
 
 	template<typename T> void setValue(T&& value);
 
@@ -41,6 +42,8 @@ private:
 	hast_t m_value_hash;
 	std::any m_value;
 	TypeQualifier m_qualifier;
+
+	mutable std::optional<hast_t> m_hash;
 };
 
 template<typename T>
@@ -65,6 +68,7 @@ template<typename T> void PlaceholderNode::setValue(T&& value)
 	}
 
 	m_value = std::forward<T>(value);
+	m_hash.reset();
 }
 
 template<typename... Args> std::shared_ptr<PlaceholderNode> PlaceholderNode::make_constant(Args&& ...args)

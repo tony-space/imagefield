@@ -47,12 +47,18 @@ iterator_range<const DataFlow*> PlaceholderNode::outputs() const noexcept
 
 GraphNode::hast_t PlaceholderNode::hash() const noexcept
 {
-	GraphNode::hast_t result = 0;
+	if (!m_hash)
+	{
+		GraphNode::hast_t result = 0;
 
-	boost::hash_combine(result, std::hash<TypeID>{}(m_output.dataType()));
-	boost::hash_combine(result, m_value_hash);
+		boost::hash_combine(result, std::hash<std::string_view>{}(operation_type));
+		boost::hash_combine(result, std::hash<TypeID>{}(m_output.dataType()));
+		boost::hash_combine(result, m_value_hash);
 
-	return result;
+		m_hash = result;
+	}
+
+	return *m_hash;
 }
 
 }
