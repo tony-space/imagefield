@@ -28,6 +28,7 @@ public:
 	virtual hast_t hash() const noexcept = 0;
 
 	//setters
+	virtual void setInput(const std::string_view& name, const DataFlow& flow) = 0;
 
 private:
 };

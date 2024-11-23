@@ -53,5 +53,25 @@ BOOST_AUTO_TEST_CASE(PlaceholderHashing)
 	BOOST_REQUIRE(c2_hash != c2->hash());
 }
 
+BOOST_AUTO_TEST_CASE(SinkNodeType)
+{
+	using namespace imf::core;
+
+	auto v1 = PlaceholderNode::make_constant(42);
+	auto v2 = PlaceholderNode::make_constant(42.0f);
+
+	auto s1 = SinkNode::make(v1->outputs().front());
+	auto s2 = SinkNode::make(v2->outputs().front());
+
+	BOOST_REQUIRE(s1->inputTypes().front() == TypeID::make<int>());
+	BOOST_REQUIRE(s2->inputTypes().front() == TypeID::make<float>());
+
+	s1->setInput("", v2->outputs().front());
+	BOOST_REQUIRE(s1->inputTypes().front() == TypeID::make<float>());
+
+	s2->setInput("test", v1->outputs().front());
+	BOOST_REQUIRE(s2->inputTypes().front() == TypeID::make<int>());
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()

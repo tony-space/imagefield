@@ -6,12 +6,8 @@
 namespace imf::core
 {
 
-SinkNode::SinkNode(std::shared_ptr<const DataFlow> flow) : m_input(std::move(flow))
+SinkNode::SinkNode(const DataFlow& flow) : m_input(flow.sharedPtr())
 {
-	if (m_input == nullptr)
-	{
-		throw std::invalid_argument("sink requres non nullptr flow");
-	}
 }
 
 std::string_view SinkNode::operationName() const noexcept
@@ -26,7 +22,8 @@ iterator_range<const std::string_view*> SinkNode::inputNames() const noexcept
 
 iterator_range<const TypeID*> SinkNode::inputTypes() const noexcept
 {
-	return { nullptr, nullptr };
+	const auto& type = m_input->dataType();
+	return { &type, &type + 1 };
 }
 
 iterator_range<const std::string_view*> SinkNode::outputNames() const noexcept
@@ -59,9 +56,14 @@ GraphNode::hast_t SinkNode::hash() const noexcept
 	return *m_hash;
 }
 
-std::shared_ptr<SinkNode> SinkNode::make(std::shared_ptr<const DataFlow> flow)
+void SinkNode::setInput(const std::string_view&, const DataFlow& flow)
 {
-	return std::make_shared<SinkNode>(std::move(flow));
+	m_input = flow.sharedPtr();
+}
+
+std::shared_ptr<SinkNode> SinkNode::make(const DataFlow& flow)
+{
+	return std::make_shared<SinkNode>(flow);
 }
 
 }

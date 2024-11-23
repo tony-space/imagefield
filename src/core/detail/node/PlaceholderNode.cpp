@@ -61,4 +61,9 @@ GraphNode::hast_t PlaceholderNode::hash() const noexcept
 	return *m_hash;
 }
 
+void PlaceholderNode::setInput(const std::string_view&, const DataFlow&)
+{
+	throw std::runtime_error("Placeholders cannot contain inputs");
+}
+
 }
