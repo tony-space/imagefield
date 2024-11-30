@@ -13,11 +13,13 @@ set(SRC
 	detail/GraphNodeFactory.cpp
 	detail/log-device-std.cpp
 	detail/log.cpp
+	detail/Region.cpp
 	detail/unique_id_t.cpp
 
 	include/imf/core/node/PlaceholderNode.hpp
 	include/imf/core/node/SinkNode.hpp
 
+	include/imf/core/BoundingBox.hpp
 	include/imf/core/core.hpp
 	include/imf/core/DataFlow.hpp
 	include/imf/core/GraphNode.hpp
@@ -25,6 +27,7 @@ set(SRC
 	include/imf/core/iterator_range.hpp
 	include/imf/core/log.hpp
 	include/imf/core/pch.hpp
+	include/imf/core/Region.hpp
 	include/imf/core/TypeID.hpp
 	include/imf/core/TypeQualifier.hpp
 	include/imf/core/unique_id_t.hpp
@@ -50,7 +53,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE IMF_CXX_FLAGS)
 target_link_libraries(${PROJECT_NAME} PUBLIC
 #	Threads::Threads
 	Boost::range
+	Boost::geometry
 	ImageField::glm
+	ImageField::earcut
 )
 
 # if(CMAKE_SYSTEM_NAME STREQUAL Android)
