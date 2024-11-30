@@ -11,3 +11,5 @@
 
 #include <imf/core/node/PlaceholderNode.hpp>
 #include <imf/core/node/SinkNode.hpp>
+
+#include <imf/core/glm.hpp>

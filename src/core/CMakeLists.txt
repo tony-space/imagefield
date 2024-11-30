@@ -50,6 +50,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE IMF_CXX_FLAGS)
 target_link_libraries(${PROJECT_NAME} PUBLIC
 #	Threads::Threads
 	Boost::range
+	ImageField::glm
 )
 
 # if(CMAKE_SYSTEM_NAME STREQUAL Android)
