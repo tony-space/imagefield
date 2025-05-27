@@ -6,11 +6,11 @@ set(BOOST_LIBS
 
 #primary deps
 	algorithm
-	atomic
 	align
 	any
 	array
 	assert
+	atomic
 	bind
 	chrono
 	concept_check
@@ -19,44 +19,46 @@ set(BOOST_LIBS
 	container_hash
 	conversion
 	core
+	crc
 	date_time
 	describe
 	detail
-	exception
 	endian
+	exception
 	function
 	function_types
 	functional
 	fusion
-	io
 	integer
 	intrusive
+	io
 	iterator
 	lexical_cast
 	math
 	move
-	mpl
 	mp11
+	mpl
 	multiprecision
 	numeric/conversion
 	optional
+	phoenix
+	pool
 	predef
 	preprocessor
-	pool
+	program_options 
 	proto
-	phoenix
 	qvm
 	ratio
 	rational
 	regex
 	serialization
+	smart_ptr
 	spirit
 	static_assert
 	system
-	smart_ptr
-	tokenizer
 	thread
 	throw_exception
+	tokenizer
 	tuple
 	type_index
 	type_traits
@@ -79,10 +81,13 @@ endforeach()
 
 set_property(TARGET boost_assert PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_atomic PROPERTY FOLDER ext/boost/)
-set_property(TARGET boost_core PROPERTY FOLDER ext/boost/)
-set_property(TARGET boost_container PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_chrono PROPERTY FOLDER ext/boost/)
+set_property(TARGET boost_container PROPERTY FOLDER ext/boost/)
+set_property(TARGET boost_core PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_date_time PROPERTY FOLDER ext/boost/)
+set_property(TARGET boost_math PROPERTY FOLDER ext/boost/)
+set_property(TARGET boost_optional PROPERTY FOLDER ext/boost/)
+set_property(TARGET boost_program_options PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_serialization PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_system PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_thread PROPERTY FOLDER ext/boost/)

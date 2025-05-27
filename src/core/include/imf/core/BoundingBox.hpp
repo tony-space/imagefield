@@ -102,7 +102,7 @@ public:
 			transform(m, vec2<3>()),
 		};
 	}
-	static [[nodiscard]] glm::vec2 transform(const glm::mat3& homogenousMat, glm::vec2 v)
+	[[nodiscard]] static glm::vec2 transform(const glm::mat3& homogenousMat, glm::vec2 v)
 	{
 		const auto p = homogenousMat * glm::vec3(v, 1.0f);
 		v = glm::vec2(p.x / p.z, p.y / p.z);

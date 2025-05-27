@@ -1,8 +1,11 @@
 #pragma once
 
+#pragma warning(push)
+#pragma warning(disable : 4127)
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
+#pragma warning(pop)
 
 #include <imf/core/BoundingBox.hpp>
 
