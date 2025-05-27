@@ -7,6 +7,7 @@
 #include <imf/core/iterator_range.hpp>
 #include <imf/core/log.hpp>
 #include <imf/core/Region.hpp>
+#include <imf/core/RuntimeFactory.hpp>
 #include <imf/core/TypeID.hpp>
 #include <imf/core/TypeQualifier.hpp>
 #include <imf/core/unique_id_t.hpp>

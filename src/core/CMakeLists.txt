@@ -14,6 +14,7 @@ set(SRC
 	detail/log-device-std.cpp
 	detail/log.cpp
 	detail/Region.cpp
+	detail/RuntimeFactory.cpp
 	detail/unique_id_t.cpp
 
 	include/imf/core/node/PlaceholderNode.hpp
@@ -24,10 +25,12 @@ set(SRC
 	include/imf/core/DataFlow.hpp
 	include/imf/core/GraphNode.hpp
 	include/imf/core/GraphNodeFactory.hpp
+	include/imf/core/IRuntime.hpp
 	include/imf/core/iterator_range.hpp
 	include/imf/core/log.hpp
 	include/imf/core/pch.hpp
 	include/imf/core/Region.hpp
+	include/imf/core/RuntimeFactory.hpp
 	include/imf/core/TypeID.hpp
 	include/imf/core/TypeQualifier.hpp
 	include/imf/core/unique_id_t.hpp

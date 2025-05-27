@@ -2,6 +2,8 @@
 
 #include <imf/core/iterator_range.hpp>
 
+#include <memory>
+
 namespace imf::core
 {
 

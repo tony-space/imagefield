@@ -8,11 +8,22 @@ BOOST_AUTO_TEST_CASE(GraphNodeFactoryRegistration)
 {
 	using namespace imf::core;
 
-	BOOST_REQUIRE_THROW(make_graph_node("FakeGraphNode"), std::out_of_range);
+	BOOST_REQUIRE_THROW(make_graph_node("FakeGraphNode")->hash(), std::out_of_range);
 
 	register_graph_node("FakeGraphNode", []() { return std::shared_ptr<GraphNode>{}; });
 
 	BOOST_REQUIRE_THROW(register_graph_node("FakeGraphNode", []() { return std::shared_ptr<GraphNode>{}; }), std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE(RuntimeFactoryRegistration)
+{
+	using namespace imf::core;
+
+	BOOST_REQUIRE_THROW(make_runtime("FakeRuntime")->platform(), std::out_of_range);
+
+	register_runtime("FakeRuntime", [](const IRuntime::init_config_t&) { return std::shared_ptr<IRuntime>{}; });
+
+	BOOST_REQUIRE_THROW(register_runtime("FakeRuntime", [](const IRuntime::init_config_t&) { return std::shared_ptr<IRuntime>{}; }), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(PlaceholderHashing)
