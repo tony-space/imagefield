@@ -47,7 +47,7 @@ endif()
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED true)
-set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER imagefield/core)
+set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER imagefield)
 
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
 
@@ -60,6 +60,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	ImageField::glm
 	ImageField::earcut
 )
+
+if (IMF_CPU_RUNTIME)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC IMF_CPU_RUNTIME_AVAILABLE)
+endif()
 
 # if(CMAKE_SYSTEM_NAME STREQUAL Android)
 # 	target_link_libraries(${PROJECT_NAME} PUBLIC log android)

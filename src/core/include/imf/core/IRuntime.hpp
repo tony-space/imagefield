@@ -14,7 +14,6 @@ struct IRuntime : public std::enable_shared_from_this<IRuntime>
 
 	virtual ~IRuntime() = default;
 	virtual std::string_view platform() const noexcept = 0;
-	virtual const init_config_t& initConfig() const noexcept = 0;
 
 };
 

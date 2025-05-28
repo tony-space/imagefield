@@ -4,14 +4,12 @@ project(ImageField)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(IMF_USE_PRECOMPILED_HEADERS "Use precompiled headers" ON)
-option(IMF_CPU_BACKEND "Enable CPU backend" ON)
-option(IMF_OPENGL_BACKEND "Enable OpenGL backend" ON)
+option(IMF_CPU_RUNTIME "Enable CPU runtime" ON)
 option(IMF_SANDBOXES "Enable sandboxes" ON)
 option(IMF_TESTS "Enable Tests" ON)
 
 MESSAGE(STATUS "Generating precompiled headers: " ${IMF_USE_PRECOMPILED_HEADERS})
-MESSAGE(STATUS "Generating CPU backend: " ${IMF_OPENGL_BACKEND})
-MESSAGE(STATUS "Generating OpenGL backend: " ${IMF_OPENGL_BACKEND})
+MESSAGE(STATUS "Generating CPU runtime: " ${IMF_CPU_RUNTIME})
 MESSAGE(STATUS "Generating sandboxes: " ${IMF_SANDBOXES})
 MESSAGE(STATUS "Generating tests: " ${IMF_TESTS})
 

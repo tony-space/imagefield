@@ -7,11 +7,20 @@
 namespace imf::core
 {
 
+#ifdef IMF_CPU_RUNTIME_AVAILABLE
+extern runtime_instantiator_t make_cpu_runtime;
+#endif
+
 using runtime_instantiators_map_t = std::map<std::string_view, runtime_instantiator_t>;
 
 static runtime_instantiators_map_t register_standard_runtimes()
 {
 	runtime_instantiators_map_t map;
+
+#ifdef IMF_CPU_RUNTIME_AVAILABLE
+	map["cpu"] = make_cpu_runtime;
+#endif // IMF_CPU_RUNTIME_AVAILABLE
+
 
 	return map;
 }
