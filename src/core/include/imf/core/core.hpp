@@ -4,6 +4,7 @@
 #include <imf/core/DataFlow.hpp>
 #include <imf/core/GraphNode.hpp>
 #include <imf/core/GraphNodeFactory.hpp>
+#include <imf/core/Image.hpp>
 #include <imf/core/iterator_range.hpp>
 #include <imf/core/log.hpp>
 #include <imf/core/Region.hpp>

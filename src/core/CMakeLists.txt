@@ -11,6 +11,7 @@ set(SRC
 	detail/DataFlow.cpp
 	detail/GraphNode.cpp
 	detail/GraphNodeFactory.cpp
+	detail/Image.cpp
 	detail/log-device-std.cpp
 	detail/log.cpp
 	detail/Region.cpp
@@ -21,12 +22,16 @@ set(SRC
 	include/imf/core/node/SinkNode.hpp
 
 	include/imf/core/BoundingBox.hpp
+	include/imf/core/ComponentMapping.hpp
 	include/imf/core/core.hpp
 	include/imf/core/DataFlow.hpp
+	include/imf/core/glm.hpp
 	include/imf/core/GraphNode.hpp
 	include/imf/core/GraphNodeFactory.hpp
+	include/imf/core/Image.hpp
 	include/imf/core/IRuntime.hpp
 	include/imf/core/iterator_range.hpp
+	include/imf/core/ITexture.hpp
 	include/imf/core/log.hpp
 	include/imf/core/pch.hpp
 	include/imf/core/Region.hpp
@@ -57,7 +62,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 #	Threads::Threads
 	Boost::range
 	Boost::geometry
-	ImageField::glm
+	glm::glm
 	ImageField::earcut
 )
 

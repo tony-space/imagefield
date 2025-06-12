@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22.1)
 
-project(IMFnode LANGUAGES CXX)
+project(IMFNode LANGUAGES CXX)
 
 set(SRC
 	detail/register_standard_graph_nodes.cpp
@@ -13,7 +13,9 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SRC})
 add_library(${PROJECT_NAME} STATIC ${SRC})
 add_library(ImageField::Node ALIAS ${PROJECT_NAME})
 
-target_precompile_headers(${PROJECT_NAME} PRIVATE include/imf/core/node/pch.hpp)
+if (IMF_USE_PRECOMPILED_HEADERS)
+	target_precompile_headers(${PROJECT_NAME} PRIVATE include/imf/core/node/pch.hpp)
+endif()
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED true)
