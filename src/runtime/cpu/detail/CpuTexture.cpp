@@ -1,6 +1,8 @@
 #include <imf/runtime/cpu/CpuTexture.hpp>
 #include <imf/core/vector_cast.hpp>
 
+#include <algorithm>
+
 namespace imf::runtime::cpu
 {
 

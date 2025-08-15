@@ -16,6 +16,7 @@ add_library(ImageField::Node ALIAS ${PROJECT_NAME})
 if (IMF_USE_PRECOMPILED_HEADERS)
 	target_precompile_headers(${PROJECT_NAME} PRIVATE include/imf/core/node/pch.hpp)
 endif()
+set_property(TARGET ${PROJECT_NAME} PROPERTY UNITY_BUILD ${IMF_UNITY_BUILD})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED true)

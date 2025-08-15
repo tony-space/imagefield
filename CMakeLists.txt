@@ -3,11 +3,13 @@ cmake_minimum_required(VERSION 3.22.1)
 project(ImageField)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+option(IMF_UNITY_BUILD "Enable Unity build" OFF)
 option(IMF_USE_PRECOMPILED_HEADERS "Use precompiled headers" ON)
 option(IMF_CPU_RUNTIME "Enable CPU runtime" ON)
 option(IMF_SANDBOXES "Enable sandboxes" ON)
 option(IMF_TESTS "Enable Tests" ON)
 
+MESSAGE(STATUS "Generating Unity build: " ${IMF_UNITY_BUILD})
 MESSAGE(STATUS "Generating precompiled headers: " ${IMF_USE_PRECOMPILED_HEADERS})
 MESSAGE(STATUS "Generating CPU runtime: " ${IMF_CPU_RUNTIME})
 MESSAGE(STATUS "Generating sandboxes: " ${IMF_SANDBOXES})

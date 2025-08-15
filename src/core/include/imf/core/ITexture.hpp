@@ -2,6 +2,8 @@
 
 #include <imf/core/glm.hpp>
 
+#include <stdexcept>
+
 namespace imf::core
 {
 
