@@ -20,9 +20,11 @@ class Image
 public:
 	struct LodSettings
 	{
-		glm::vec2 lodMin = { 0.0f, 0.0f };
-		glm::vec2 lodMax = { 1024.0f, 1024.0f };
-		glm::vec2 lodBias = { 0.0f, 0.0f };
+		glm::vec2 lodMin;
+		glm::vec2 lodMax;
+		glm::vec2 lodBias;
+
+		LodSettings();
 	};
 
 	/// <summary>
@@ -32,15 +34,15 @@ public:
 	/// <param name="boundingBox">Defines the AABB of the image in world coordinates</param>
 	/// <param name="region">Optionally defines the region of the image to be used. Pixels outside the region are black and transparent</param>
 	/// <param name="componentMapping">Optionally defines if the image components must be swizzled during readings</param>
-	/// <param name="lodSettings">Optionally d level-of-detail limits and bias</param>
-	/// <param name="uvToWorldMat">Optionally d conversion from normalized texture coordinates [0-1] to world coordinates</param>
+	/// <param name="lodSettings">Optionally defines level-of-detail limits and bias</param>
+	/// <param name="uvToWorldMat">Optionally defines conversion from normalized texture coordinates [0-1] to world coordinates</param>
 	explicit Image
 	(
 		std::shared_ptr<const ITexture> texture,
-		BoundingBox boundingBox,
+		const BoundingBox& boundingBox,
 		std::shared_ptr<const Region> region = {},
 		ComponentMapping componentMapping = {},
-		LodSettings lodSettings = LodSettings{},
+		LodSettings lodSettings = {},
 		std::optional<glm::mat3> uvToWorldMat = {}
 	);
 
@@ -58,8 +60,14 @@ private:
 	BoundingBox m_boundingBox;
 	ComponentMapping m_componentMapping;
 	LodSettings m_lodSettings;
+	glm::vec2 m_isoLevelOfDetail;
 	glm::mat3 m_uvToWorldMat;
 	glm::mat3 m_worldToUvMat;
+
+	void validateGeometry() const;
+	void initLevelOfDetail();
+
+	static glm::mat3 calcUvToWorldMat(const BoundingBox& extent) noexcept;
 };
 
 }

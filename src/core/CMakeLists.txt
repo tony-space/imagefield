@@ -39,6 +39,7 @@ set(SRC
 	include/imf/core/TypeID.hpp
 	include/imf/core/TypeQualifier.hpp
 	include/imf/core/unique_id_t.hpp
+	include/imf/core/vector_cast.hpp
 )
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SRC})

@@ -7,7 +7,7 @@ int main()
 		using namespace imf::core;
 
 		auto cpuRuntime = make_runtime("cpu");
-		cpuRuntime->loadImage("../assets/lenna.png");
+		auto image = cpuRuntime->loadImage("assets/png/lenna.png");
 		
 	}
 	catch (const std::exception& ex)

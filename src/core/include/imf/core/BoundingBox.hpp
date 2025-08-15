@@ -92,6 +92,17 @@ public:
 
 		return true;
 	}
+	
+	constexpr glm::uvec2 intSize() const
+	{
+		if (!finite())
+		{
+			throw std::runtime_error("bounding box is infinite");
+		}
+
+		return glm::round(size());
+	}
+
 	[[nodiscard]] constexpr BoundingBox transform(const glm::mat3& m) const noexcept
 	{
 		return

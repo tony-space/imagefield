@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLM_SWIZZLE
 #include <glm/glm.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL

@@ -1,11 +1,17 @@
 #pragma once
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127)
+#endif
+
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
+
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 
 #include <imf/core/BoundingBox.hpp>
 

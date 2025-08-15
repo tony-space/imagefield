@@ -1,5 +1,7 @@
 #pragma once
 
+#include <imf/core/Image.hpp>
+
 #include <any>
 #include <filesystem>
 #include <map>
@@ -15,7 +17,7 @@ struct IRuntime : public std::enable_shared_from_this<IRuntime>
 
 	virtual ~IRuntime() = default;
 	virtual std::string_view platform() const noexcept = 0;
-	virtual core::Image loadImage(const std::filesystem::path& path) = 0;
+	[[nodiscard]] virtual core::Image loadImage(const std::filesystem::path& path) = 0;
 
 };
 
