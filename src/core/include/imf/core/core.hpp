@@ -6,7 +6,9 @@
 #include <imf/core/GraphNodeFactory.hpp>
 #include <imf/core/Image.hpp>
 #include <imf/core/iterator_range.hpp>
+#include <imf/core/ITexture.hpp>
 #include <imf/core/log.hpp>
+#include <imf/core/pixel_transform.hpp>
 #include <imf/core/Region.hpp>
 #include <imf/core/RuntimeFactory.hpp>
 #include <imf/core/TypeID.hpp>

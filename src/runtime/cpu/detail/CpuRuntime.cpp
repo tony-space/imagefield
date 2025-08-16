@@ -56,6 +56,8 @@ core::Image CpuRuntime::loadImage(const std::filesystem::path& path)
 	hostData.data = data;
 	hostData.dim = { static_cast<unsigned>(width), static_cast<unsigned>(height), 1 };
 	hostData.format = static_cast<core::TextureFormat>(channels - 1);
+	hostData.rowAlignment = 1;
+	hostData.planeAlignment = 1;
 
 	try
 	{

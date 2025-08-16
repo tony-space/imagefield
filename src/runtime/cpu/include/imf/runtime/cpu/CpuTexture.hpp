@@ -7,7 +7,7 @@
 namespace imf::runtime::cpu
 {
 
-class CpuTexture : public core::ITexture
+class CpuTexture : public core::ITexture, public core::IReadMapTexture
 {
 public:
 	constexpr static std::size_t kRowAlignment = 32;
@@ -21,6 +21,8 @@ public:
 	CpuTexture& operator=(CpuTexture&&) = delete;
 
 	glm::uvec3 dim() const override;
+	const core::TextureData readMap() const override;
+	void unmap() const noexcept override;
 private:
 	std::unique_ptr<std::uint8_t[]> m_data;
 	core::TextureFormat m_format;

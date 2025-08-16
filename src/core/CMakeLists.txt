@@ -12,8 +12,9 @@ set(SRC
 	detail/GraphNode.cpp
 	detail/GraphNodeFactory.cpp
 	detail/Image.cpp
-	detail/log-device-std.cpp
 	detail/log.cpp
+	detail/log-device-std.cpp
+	detail/pixel_transform.cpp
 	detail/Region.cpp
 	detail/RuntimeFactory.cpp
 	detail/unique_id_t.cpp
@@ -34,6 +35,7 @@ set(SRC
 	include/imf/core/ITexture.hpp
 	include/imf/core/log.hpp
 	include/imf/core/pch.hpp
+	include/imf/core/pixel_transform.hpp
 	include/imf/core/Region.hpp
 	include/imf/core/RuntimeFactory.hpp
 	include/imf/core/TypeID.hpp

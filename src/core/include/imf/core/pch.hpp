@@ -4,5 +4,6 @@
 
 #include <boost/container_hash/hash.hpp>
 
-#include <stdexcept>
 #include <map>
+#include <stdexcept>
+#include <utility>

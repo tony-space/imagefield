@@ -54,6 +54,15 @@ public:
 	Image& operator=(const Image&) = default;
 	Image& operator=(Image&&) = default;
 
+	[[nodiscard]] const auto& texture() const noexcept { return m_texture; }
+	[[nodiscard]] const auto& region() const noexcept { return m_region; }
+	[[nodiscard]] const auto& boundingBox() const noexcept { return m_boundingBox; }
+	[[nodiscard]] const auto& componentMapping() const noexcept { return m_componentMapping; }
+	[[nodiscard]] const auto& lodSettings() const noexcept { return m_lodSettings; }
+	[[nodiscard]] const auto& isotropicLevelOfDetail() const noexcept { return m_isoLevelOfDetail; }
+	[[nodiscard]] const auto& uvToWorldMat() const noexcept { return m_uvToWorldMat; }
+	[[nodiscard]] const auto& worldToUvMat() const noexcept { return m_worldToUvMat; }
+
 private:
 	std::shared_ptr<const ITexture> m_texture;
 	std::shared_ptr<const Region> m_region;

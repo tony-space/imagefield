@@ -4,6 +4,7 @@
 
 namespace imf::core
 {
+
 template<typename T>
 constexpr glm::vec4 to_vec4_norm(const glm::vec<1, T, glm::defaultp>& orig)
 {
@@ -178,4 +179,5 @@ constexpr T from_vec4_norm(const glm::vec4& orig)
 {
 	return detail::from_vec4_norm<T>::invoke(orig);
 }
+
 }
