@@ -12,7 +12,7 @@ SinkNode::SinkNode(const DataFlow& flow) : m_input(flow.sharedPtr())
 
 std::string_view SinkNode::operationName() const noexcept
 {
-	return operation_type;
+	return operation_name;
 }
 
 iterator_range<const std::string_view*> SinkNode::inputNames() const noexcept
@@ -24,6 +24,11 @@ iterator_range<const TypeID*> SinkNode::inputTypes() const noexcept
 {
 	const auto& type = m_input->dataType();
 	return { &type, &type + 1 };
+}
+
+iterator_range<const std::shared_ptr<const DataFlow>*> SinkNode::inputs() const noexcept
+{
+	return { &m_input, &m_input + 1 };
 }
 
 iterator_range<const std::string_view*> SinkNode::outputNames() const noexcept
@@ -43,17 +48,12 @@ iterator_range<const DataFlow*> SinkNode::outputs() const noexcept
 
 GraphNode::hast_t SinkNode::hash() const noexcept
 {
-	if (!m_hash)
-	{
-		GraphNode::hast_t result = 0;
+	GraphNode::hast_t result = 0;
 
-		boost::hash_combine(result, std::hash<std::string_view>{}(operation_type));
-		boost::hash_combine(result, m_input->producer()->hash());
+	boost::hash_combine(result, std::hash<std::string_view>{}(operation_name));
+	boost::hash_combine(result, m_input->producer()->hash());
 
-		m_hash = result;
-	}
-
-	return *m_hash;
+	return result;
 }
 
 void SinkNode::setInput(const std::string_view&, const DataFlow& flow)

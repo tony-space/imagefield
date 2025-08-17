@@ -12,36 +12,30 @@ template <typename T>
 struct type_id_t
 {
 	using type = T;
-	static const unique_id_t value;
+	inline static const unique_id_t value = make_unique_id();
+	constexpr static const unique_id_t* value_ptr = &value;
 };
-
-template <typename T>
-unique_id_t type_id_v = type_id_t<T>::value;
-
-
-template <typename T>
-const unique_id_t type_id_t<T>::value = make_unique_id();
 
 class TypeID
 {
 public:
-	using value_type = unique_id_t;
+	using value_type = const unique_id_t*;
 
-	const value_type value = empty_unique_id;
+	const value_type value = nullptr;
 
-	template <typename T> static TypeID make() noexcept;
+	template <typename T>
+	constexpr static TypeID make() noexcept;
 
 	friend inline bool operator==(const TypeID& lhs, const TypeID& rhs) { return lhs.value == rhs.value; }
 	friend inline bool operator!=(const TypeID& lhs, const TypeID& rhs) { return !(lhs == rhs); }
 };
 
 template <typename T>
-TypeID TypeID::make() noexcept
+constexpr TypeID TypeID::make() noexcept
 {
-	// type id value is calculated during global initialization phase
 	return
 	{
-		type_id_v<T>
+		type_id_t<T>::value_ptr
 	};
 }
 

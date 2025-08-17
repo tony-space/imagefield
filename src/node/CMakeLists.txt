@@ -5,7 +5,10 @@ project(IMFNode LANGUAGES CXX)
 set(SRC
 	detail/register_standard_graph_nodes.cpp
 
+	include/imf/core/node/GraphNodeBase.hpp
 	include/imf/core/node/pch.hpp
+
+	detail/AffineTransformNode.cpp
 )
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SRC})

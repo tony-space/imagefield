@@ -81,3 +81,11 @@ private:
 
 }
 
+template<>
+struct std::hash<imf::core::Image>
+{
+	std::size_t operator()(const imf::core::Image&) const noexcept
+	{
+		return 0;
+	}
+};

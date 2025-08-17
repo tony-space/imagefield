@@ -10,7 +10,7 @@ namespace imf::core
 class SinkNode final : public GraphNode
 {
 public:
-	constexpr static std::string_view operation_type = "Sink";
+	constexpr static std::string_view operation_name = "Sink";
 
 	SinkNode(const DataFlow& flow);
 	SinkNode(const SinkNode&) = delete;
@@ -22,9 +22,12 @@ public:
 	std::string_view operationName() const noexcept override;
 	iterator_range<const std::string_view*> inputNames() const noexcept override;
 	iterator_range<const TypeID*> inputTypes() const noexcept override;
+	iterator_range<const std::shared_ptr<const DataFlow>*> inputs() const noexcept override;
+
 	iterator_range<const std::string_view*> outputNames() const noexcept override;
 	iterator_range<const TypeID*> outputTypes() const noexcept override;
 	iterator_range<const DataFlow*> outputs() const noexcept override;
+
 	hast_t hash() const noexcept override;
 
 	// setters
@@ -34,7 +37,6 @@ public:
 
 private:
 	std::shared_ptr<const DataFlow> m_input;
-	mutable std::optional<hast_t> m_hash;
 };
 
 }

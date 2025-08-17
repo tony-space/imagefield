@@ -7,8 +7,6 @@
 namespace imf::core
 {
 
-std::map<std::string_view, graph_node_instantiator_t> register_standard_graph_nodes();
-
 static std::map<std::string_view, graph_node_instantiator_t>& graph_node_instantiators()
 {
 	static std::map<std::string_view, graph_node_instantiator_t> map(register_standard_graph_nodes());

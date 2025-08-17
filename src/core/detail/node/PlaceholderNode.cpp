@@ -15,7 +15,7 @@ PlaceholderNode::PlaceholderNode(TypeQualifier qualifier, TypeID typeId) :
 
 std::string_view PlaceholderNode::operationName() const noexcept
 {
-	return operation_type;
+	return operation_name;
 }
 
 iterator_range<const std::string_view*> PlaceholderNode::inputNames() const noexcept
@@ -24,6 +24,11 @@ iterator_range<const std::string_view*> PlaceholderNode::inputNames() const noex
 }
 
 iterator_range<const TypeID*> PlaceholderNode::inputTypes() const noexcept
+{
+	return { nullptr, nullptr };
+}
+
+iterator_range<const std::shared_ptr<const DataFlow>*> PlaceholderNode::inputs() const noexcept
 {
 	return { nullptr, nullptr };
 }
@@ -47,18 +52,13 @@ iterator_range<const DataFlow*> PlaceholderNode::outputs() const noexcept
 
 GraphNode::hast_t PlaceholderNode::hash() const noexcept
 {
-	if (!m_hash)
-	{
-		GraphNode::hast_t result = 0;
+	GraphNode::hast_t result = 0;
 
-		boost::hash_combine(result, std::hash<std::string_view>{}(operation_type));
-		boost::hash_combine(result, std::hash<TypeID>{}(m_output.dataType()));
-		boost::hash_combine(result, m_value_hash);
+	boost::hash_combine(result, std::hash<std::string_view>{}(operation_name));
+	boost::hash_combine(result, std::hash<TypeID>{}(m_output.dataType()));
+	boost::hash_combine(result, m_value_hash);
 
-		m_hash = result;
-	}
-
-	return *m_hash;
+	return result;
 }
 
 void PlaceholderNode::setInput(const std::string_view&, const DataFlow&)

@@ -22,6 +22,7 @@ public:
 
 	virtual iterator_range<const std::string_view*> inputNames() const noexcept = 0;
 	virtual iterator_range<const TypeID*> inputTypes() const noexcept = 0;
+	virtual iterator_range<const std::shared_ptr<const DataFlow>*> inputs() const noexcept = 0;
 	
 	virtual iterator_range<const std::string_view*> outputNames() const noexcept = 0;
 	virtual iterator_range<const TypeID*> outputTypes() const noexcept = 0;

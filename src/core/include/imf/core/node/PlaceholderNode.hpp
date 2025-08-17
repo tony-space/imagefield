@@ -14,7 +14,7 @@ namespace imf::core
 class PlaceholderNode final : public GraphNode
 {
 public:
-	constexpr static std::string_view operation_type = "Placeholder";
+	constexpr static std::string_view operation_name = "Placeholder";
 
 	template<typename T> PlaceholderNode(TypeQualifier qualifier, T&& value);
 	PlaceholderNode(TypeQualifier qualifier, TypeID typeId);
@@ -27,9 +27,12 @@ public:
 	std::string_view operationName() const noexcept override;
 	iterator_range<const std::string_view*> inputNames() const noexcept override;
 	iterator_range<const TypeID*> inputTypes() const noexcept override;
+	iterator_range<const std::shared_ptr<const DataFlow>*> inputs() const noexcept override;
+
 	iterator_range<const std::string_view*> outputNames() const noexcept override;
 	iterator_range<const TypeID*> outputTypes() const noexcept override;
 	iterator_range<const DataFlow*> outputs() const noexcept override;
+	
 	hast_t hash() const noexcept override;
 
 	// setters
@@ -46,14 +49,12 @@ private:
 	hast_t m_value_hash;
 	std::any m_value;
 	TypeQualifier m_qualifier;
-
-	mutable std::optional<hast_t> m_hash;
 };
 
 template<typename T>
 PlaceholderNode::PlaceholderNode(TypeQualifier qualifier, T&& value) :
 	m_output(this, TypeID::make<std::decay_t<T>>()),
-	m_value_hash(qualifier == TypeQualifier::Constant ? std::hash<std::decay_t<T>>{}(value) : std::hash<unique_id_t>{}(make_unique_id())),
+	m_value_hash(std::hash<std::decay_t<T>>{}(value)),
 	m_value(std::forward<T>(value)),
 	m_qualifier(qualifier)
 {
@@ -72,7 +73,6 @@ template<typename T> void PlaceholderNode::setValue(T&& value)
 	}
 
 	m_value = std::forward<T>(value);
-	m_hash.reset();
 }
 
 template<typename... Args> std::shared_ptr<PlaceholderNode> PlaceholderNode::make_constant(Args&& ...args)
