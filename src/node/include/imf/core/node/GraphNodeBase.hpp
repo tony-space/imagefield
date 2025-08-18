@@ -1,6 +1,10 @@
 #pragma once
 
+#include <imf/core/TypeID.hpp>
+#include <imf/core/Image.hpp>
 #include <imf/core/GraphNode.hpp>
+#include <imf/core/glm.hpp>
+#include <imf/core/DataFlow.hpp>
 
 #include <boost/container_hash/hash.hpp>
 
