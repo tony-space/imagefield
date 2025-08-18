@@ -54,7 +54,7 @@ private:
 template<typename T>
 PlaceholderNode::PlaceholderNode(TypeQualifier qualifier, T&& value) :
 	m_output(this, TypeID::make<std::decay_t<T>>()),
-	m_value_hash(std::hash<std::decay_t<T>>{}(value)),
+	m_value_hash(qualifier == TypeQualifier::Constant ? std::hash<std::decay_t<T>>{}(value) : std::hash<unique_id_t>{}(make_unique_id())),
 	m_value(std::forward<T>(value)),
 	m_qualifier(qualifier)
 {
