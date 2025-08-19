@@ -1,8 +1,6 @@
 #include <imf/core/node/SinkNode.hpp>
 #include <imf/core/DataFlow.hpp>
 
-#include <boost/container_hash/hash.hpp>
-
 namespace imf::core
 {
 
@@ -44,16 +42,6 @@ iterator_range<const TypeID*> SinkNode::outputTypes() const noexcept
 iterator_range<const DataFlow*> SinkNode::outputs() const noexcept
 {
 	return { nullptr, nullptr };
-}
-
-GraphNode::hast_t SinkNode::hash() const noexcept
-{
-	GraphNode::hast_t result = 0;
-
-	boost::hash_combine(result, std::hash<std::string_view>{}(operation_name));
-	boost::hash_combine(result, m_input->producer()->hash());
-
-	return result;
 }
 
 void SinkNode::setInput(const std::string_view&, const DataFlow& flow)

@@ -28,8 +28,6 @@ public:
 	virtual iterator_range<const TypeID*> outputTypes() const noexcept = 0;
 	virtual iterator_range<const DataFlow*> outputs() const noexcept = 0;
 
-	virtual hast_t hash() const noexcept = 0;
-
 	//setters
 	virtual void setInput(const std::string_view& name, const DataFlow& flow) = 0;
 

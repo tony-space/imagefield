@@ -40,12 +40,3 @@ constexpr TypeID TypeID::make() noexcept
 }
 
 }
-
-template<>
-struct std::hash<imf::core::TypeID>
-{
-	std::size_t operator()(const imf::core::TypeID& s) const noexcept
-	{
-		return std::hash<imf::core::TypeID::value_type>{}(s.value);
-	}
-};

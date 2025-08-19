@@ -6,8 +6,6 @@
 #include <imf/core/glm.hpp>
 #include <imf/core/DataFlow.hpp>
 
-#include <boost/container_hash/hash.hpp>
-
 #include <array>
 #include <stdexcept>
 
@@ -69,19 +67,6 @@ public:
 	iterator_range<const DataFlow*> outputs() const noexcept override final
 	{
 		return { m_outputs.data(), m_outputs.data() + m_outputs.size() };
-	}
-
-	hast_t hash() const noexcept override final
-	{
-		GraphNode::hast_t result = 0;
-
-		boost::hash_combine(result, std::hash<std::string_view>{}(Derived::operation_name));
-		for (const auto& input : m_inputs)
-		{
-			boost::hash_combine(result, input->producer()->hash());
-		}
-
-		return result;
 	}
 
 	void setInput(const std::string_view& name, const DataFlow& flow) override final

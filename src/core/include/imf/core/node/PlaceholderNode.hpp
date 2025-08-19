@@ -33,8 +33,6 @@ public:
 	iterator_range<const TypeID*> outputTypes() const noexcept override;
 	iterator_range<const DataFlow*> outputs() const noexcept override;
 	
-	hast_t hash() const noexcept override;
-
 	// setters
 	void setInput(const std::string_view& name, const DataFlow& flow) override;
 
@@ -46,7 +44,6 @@ public:
 
 private:
 	DataFlow m_output;
-	hast_t m_value_hash;
 	std::any m_value;
 	TypeQualifier m_qualifier;
 };
@@ -54,7 +51,6 @@ private:
 template<typename T>
 PlaceholderNode::PlaceholderNode(TypeQualifier qualifier, T&& value) :
 	m_output(this, TypeID::make<std::decay_t<T>>()),
-	m_value_hash(qualifier == TypeQualifier::Constant ? std::hash<std::decay_t<T>>{}(value) : std::hash<unique_id_t>{}(make_unique_id())),
 	m_value(std::forward<T>(value)),
 	m_qualifier(qualifier)
 {
@@ -65,11 +61,6 @@ template<typename T> void PlaceholderNode::setValue(T&& value)
 	if (TypeID::make<std::decay_t<T>>() != m_output.dataType())
 	{
 		throw std::invalid_argument("value type does not match output type");
-	}
-
-	if (m_qualifier == TypeQualifier::Constant)
-	{
-		m_value_hash = std::hash<std::decay_t<T>>{}(value);
 	}
 
 	m_value = std::forward<T>(value);

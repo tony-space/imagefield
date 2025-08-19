@@ -47,12 +47,3 @@ inline glm::mat3 scale(glm::vec2 s)
 }
 
 }
-
-template<>
-struct std::hash<glm::mat3>
-{
-	std::size_t operator()(const glm::mat3&) const noexcept
-	{
-		return 0;
-	}
-};

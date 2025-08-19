@@ -28,8 +28,6 @@ public:
 	iterator_range<const TypeID*> outputTypes() const noexcept override;
 	iterator_range<const DataFlow*> outputs() const noexcept override;
 
-	hast_t hash() const noexcept override;
-
 	// setters
 	void setInput(const std::string_view& name, const DataFlow& flow) override;
 
