@@ -4,7 +4,7 @@ namespace imf::core
 {
 
 PlaceholderNode::PlaceholderNode(TypeQualifier qualifier, TypeID typeId) :
-	m_output(this, std::move(typeId)),
+	m_output(*this, std::move(typeId)),
 	m_qualifier(qualifier)
 {
 

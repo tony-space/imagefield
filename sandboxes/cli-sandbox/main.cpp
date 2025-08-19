@@ -9,17 +9,22 @@ int main()
 		using namespace imf::core;
 
 		auto cpuRuntime = make_runtime("cpu");
-		auto image = cpuRuntime->loadImage("../assets/png/lenna.png");
-
-		auto imgPlaceholder = PlaceholderNode::make_variable(image);
+		
+		auto imgPlaceholder = PlaceholderNode::make_variable(cpuRuntime->loadImage("../assets/png/lenna.png"));
 		auto transformPlaceholder = PlaceholderNode::make_variable(rotate_deg(45.0f));
-		auto affine = make_graph_node("AffineTransform");
 
+		auto affine = make_graph_node("Transform");
 		affine->setInput("image", imgPlaceholder->outputs().front());
-		affine->setInput("transformMat", transformPlaceholder->outputs().front());
+		affine->setInput("matrix", transformPlaceholder->outputs().front());
 
+		auto sink = SinkNode::make(affine->outputs().front());
+		
+		auto executor = GraphExecutor::make(cpuRuntime, sink);
 
-		const auto texture = std::dynamic_pointer_cast<const IReadMapTexture>(image.texture());
+		auto executionResult = executor->run();
+		auto result = std::any_cast<Image&&>(std::move(executionResult.front().value));
+
+		const auto texture = std::dynamic_pointer_cast<const IReadMapTexture>(result.texture());
 		texture->mapUnmap([](const TextureData& deviceData)
 		{
 			constexpr static std::size_t kAlignment = 32;

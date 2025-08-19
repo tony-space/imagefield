@@ -23,7 +23,9 @@ public:
 	PlaceholderNode& operator=(const PlaceholderNode&) = delete;
 	PlaceholderNode& operator=(PlaceholderNode&&) noexcept = delete;
 
+	//
 	// getters
+	//
 	std::string_view operationName() const noexcept override;
 	iterator_range<const std::string_view*> inputNames() const noexcept override;
 	iterator_range<const TypeID*> inputTypes() const noexcept override;
@@ -32,11 +34,21 @@ public:
 	iterator_range<const std::string_view*> outputNames() const noexcept override;
 	iterator_range<const TypeID*> outputTypes() const noexcept override;
 	iterator_range<const DataFlow*> outputs() const noexcept override;
+
+	TypeQualifier typeQualifier() const noexcept { return m_qualifier; }
 	
+	//
 	// setters
+	//
 	void setInput(const std::string_view& name, const DataFlow& flow) override;
+	void setTypeQualifier(TypeQualifier qualifier) noexcept { m_qualifier = qualifier; }
 
 	template<typename T> void setValue(T&& value);
+	template<typename T> const T& value() const { return std::any_cast<const T&>(m_value); }
+	template<typename T> T& value() { return std::any_cast<T&>(m_value); }
+	const std::any& value() const noexcept { return m_value; }
+	std::any& value() noexcept { return m_value; }
+	void resetValue() noexcept { m_value.reset(); }
 
 	template<typename... Args> static std::shared_ptr<PlaceholderNode> make_constant(Args&& ...args);
 	template<typename... Args> static std::shared_ptr<PlaceholderNode> make_variable(Args&& ...args);
@@ -50,7 +62,7 @@ private:
 
 template<typename T>
 PlaceholderNode::PlaceholderNode(TypeQualifier qualifier, T&& value) :
-	m_output(this, TypeID::make<std::decay_t<T>>()),
+	m_output(*this, TypeID::make<std::decay_t<T>>()),
 	m_value(std::forward<T>(value)),
 	m_qualifier(qualifier)
 {

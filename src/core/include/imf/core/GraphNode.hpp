@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imf/core/iterator_range.hpp>
+#include <imf/core/unique_id_t.hpp>
 
 #include <memory>
 
@@ -13,11 +14,11 @@ class TypeID;
 class GraphNode : public std::enable_shared_from_this<GraphNode>
 {
 public:
-	using hast_t = size_t;
-
 	virtual ~GraphNode() = default;
 
 	// getters
+	unique_id_t instanceId() const noexcept { return m_instanceId; }
+
 	virtual std::string_view operationName() const noexcept = 0;
 
 	virtual iterator_range<const std::string_view*> inputNames() const noexcept = 0;
@@ -31,7 +32,54 @@ public:
 	//setters
 	virtual void setInput(const std::string_view& name, const DataFlow& flow) = 0;
 
+	template<typename T> T* as();
+	template<typename T> const T* as() const;
+	template<typename T> T& is();
+	template<typename T> const T& is() const;
+
 private:
+	unique_id_t m_instanceId{ make_unique_id() };
 };
+
+template<typename T>
+T* GraphNode::as()
+{
+	if (T::operation_name == operationName())
+	{
+		return static_cast<T*>(this);
+	}
+	return nullptr;
+}
+
+template<typename T>
+const T* GraphNode::as() const
+{
+	if (T::operation_name == operationName())
+	{
+		return static_cast<const T*>(this);
+	}
+	return nullptr;
+}
+
+template<typename T>
+T& GraphNode::is()
+{
+	if (T::operation_name == operationName())
+	{
+		return static_cast<T&>(*this);
+	}
+
+	throw std::bad_cast();
+}
+
+template<typename T>
+const T& GraphNode::is() const
+{
+	if (T::operation_name == operationName())
+	{
+		return static_cast<const T&>(*this);
+	}
+	throw std::bad_cast();
+}
 
 }

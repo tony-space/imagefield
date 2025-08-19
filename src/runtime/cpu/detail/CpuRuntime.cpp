@@ -1,3 +1,5 @@
+#include "NaiveGraphCompiler.hpp"
+
 #include <imf/runtime/cpu/CpuRuntime.hpp>
 #include <imf/runtime/cpu/CpuTexture.hpp>
 
@@ -36,6 +38,11 @@ std::vector<std::uint8_t> CpuRuntime::fetchContent(const std::filesystem::path& 
 	}
 
 	return { std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>() };
+}
+
+std::shared_ptr<core::IGraphCompiler> CpuRuntime::compiler()
+{
+	return std::make_shared<NaiveGraphCompiler>(*this);
 }
 
 core::Image CpuRuntime::loadImage(const std::filesystem::path& path)

@@ -1,18 +1,24 @@
 #pragma once
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4127)
-#pragma warning(disable : 4244)
-#pragma warning(disable : 4100)
+#if _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable : 4127)
+	#pragma warning(disable : 4244)
+	#pragma warning(disable : 4100)
+#elif __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wunused-parameter"
+	#pragma clang diagnostic ignored "-Wunused-lambda-capture"
 #endif
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
+#if _MSC_VER
+	#pragma warning(pop)
+#elif __clang__
+	#pragma clang diagnostic pop
 #endif
 
 #include <imf/core/BoundingBox.hpp>

@@ -8,7 +8,7 @@ set(SRC
 	include/imf/core/node/GraphNodeBase.hpp
 	include/imf/core/node/pch.hpp
 
-	detail/AffineTransformNode.cpp
+	detail/TransformNode.cpp
 )
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SRC})
