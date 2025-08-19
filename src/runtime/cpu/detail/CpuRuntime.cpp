@@ -3,6 +3,7 @@
 
 #include <imf/core/Image.hpp>
 #include <imf/core/ITexture.hpp>
+#include <imf/core/IGraphCompiler.hpp>
 #include <imf/core/RuntimeFactory.hpp>
 
 #include <stb/stb_image.h>
@@ -36,6 +37,20 @@ std::vector<std::uint8_t> CpuRuntime::fetchContent(const std::filesystem::path& 
 	}
 
 	return { std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>() };
+}
+
+std::shared_ptr<core::IGraphCompiler> CpuRuntime::compiler()
+{
+	class Stub : public core::IGraphCompiler
+	{
+	public:
+		core::ExecutionPlan build(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>&) override
+		{
+			return {};
+		}
+	};
+
+	return std::make_shared<Stub>();
 }
 
 core::Image CpuRuntime::loadImage(const std::filesystem::path& path)

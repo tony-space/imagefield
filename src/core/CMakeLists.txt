@@ -9,6 +9,7 @@ set(SRC
 	detail/node/SinkNode.cpp
 
 	detail/DataFlow.cpp
+	detail/GraphExecutor.cpp
 	detail/GraphNode.cpp
 	detail/GraphNodeFactory.cpp
 	detail/Image.cpp
@@ -26,9 +27,13 @@ set(SRC
 	include/imf/core/ComponentMapping.hpp
 	include/imf/core/core.hpp
 	include/imf/core/DataFlow.hpp
+	include/imf/core/ExecutionPlan.hpp
 	include/imf/core/glm.hpp
+	Include/imf/core/GraphExecutor.hpp
 	include/imf/core/GraphNode.hpp
 	include/imf/core/GraphNodeFactory.hpp
+	include/imf/core/IBackendOperation.hpp
+	include/imf/core/IGraphCompiler.hpp
 	include/imf/core/Image.hpp
 	include/imf/core/IRuntime.hpp
 	include/imf/core/iterator_range.hpp
@@ -37,6 +42,7 @@ set(SRC
 	include/imf/core/pch.hpp
 	include/imf/core/pixel_transform.hpp
 	include/imf/core/Region.hpp
+	include/imf/core/Registers.hpp
 	include/imf/core/RuntimeFactory.hpp
 	include/imf/core/TypeID.hpp
 	include/imf/core/TypeQualifier.hpp

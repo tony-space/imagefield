@@ -2,6 +2,7 @@
 
 #include <imf/core/BoundingBox.hpp>
 #include <imf/core/DataFlow.hpp>
+#include <imf/core/GraphExecutor.hpp>
 #include <imf/core/GraphNode.hpp>
 #include <imf/core/GraphNodeFactory.hpp>
 #include <imf/core/Image.hpp>

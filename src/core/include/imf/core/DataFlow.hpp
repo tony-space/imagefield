@@ -12,7 +12,11 @@ class GraphNode;
 class DataFlow
 {
 public:
-	DataFlow(GraphNode* _producer, TypeID _type);
+	DataFlow(GraphNode* _producer, TypeID _type) :
+		m_producer(_producer),
+		m_dataType(std::move(_type))
+	{
+	}
 
 	DataFlow(const DataFlow&) = delete;
 	DataFlow(DataFlow&&) = delete;
@@ -20,10 +24,10 @@ public:
 	DataFlow& operator=(const DataFlow&) = delete;
 	DataFlow& operator=(DataFlow&&) = delete;
 
-	unique_id_t id() const noexcept;
-	std::shared_ptr<GraphNode> producer() noexcept;
-	std::shared_ptr<const GraphNode> producer() const noexcept;
-	const TypeID& dataType() const noexcept;
+	unique_id_t id() const noexcept { return m_id; }
+	GraphNode* producer() noexcept { return m_producer; }
+	const GraphNode* producer() const noexcept { return m_producer; }
+	const TypeID& dataType() const noexcept { return m_dataType; }
 
 	std::shared_ptr<const DataFlow> sharedPtr() const noexcept;
 
