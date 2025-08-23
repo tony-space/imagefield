@@ -11,6 +11,7 @@ set(BOOST_LIBS
 	array
 	assert
 	atomic
+	bimap
 	bind
 	chrono
 	concept_check
@@ -23,31 +24,40 @@ set(BOOST_LIBS
 	date_time
 	describe
 	detail
+	dynamic_bitset
 	endian
 	exception
+	foreach
 	function
 	function_types
 	functional
 	fusion
+	graph
 	integer
 	intrusive
 	io
 	iterator
+	lambda
 	lexical_cast
 	math
 	move
 	mp11
 	mpl
+	multi_index
 	multiprecision
 	numeric/conversion
 	optional
+	parameter
 	phoenix
 	pool
 	predef
 	preprocessor
 	program_options 
+	property_map
+	property_tree
 	proto
 	qvm
+	random
 	ratio
 	rational
 	regex
@@ -59,6 +69,7 @@ set(BOOST_LIBS
 	thread
 	throw_exception
 	tokenizer
+	tti
 	tuple
 	type_index
 	type_traits
@@ -68,6 +79,7 @@ set(BOOST_LIBS
 	variant
 	variant2
 	winapi
+	xpressive
 
 #secondary deps
 	geometry
@@ -85,9 +97,12 @@ set_property(TARGET boost_chrono PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_container PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_core PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_date_time PROPERTY FOLDER ext/boost/)
+set_property(TARGET boost_exception PROPERTY FOLDER ext/boost/)
+set_property(TARGET boost_graph PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_math PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_optional PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_program_options PROPERTY FOLDER ext/boost/)
+set_property(TARGET boost_random PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_serialization PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_system PROPERTY FOLDER ext/boost/)
 set_property(TARGET boost_thread PROPERTY FOLDER ext/boost/)

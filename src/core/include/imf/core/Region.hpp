@@ -3,6 +3,8 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127)
+#pragma warning(disable : 4244)
+#pragma warning(disable : 4100)
 #endif
 
 #include <boost/geometry.hpp>
