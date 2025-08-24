@@ -5,6 +5,8 @@
 #include <imf/core/GraphNodeFactory.hpp>
 #include <imf/core/IGraphCompiler.hpp>
 
+#include <set>
+
 namespace imf::core
 {
 
@@ -17,10 +19,10 @@ static void recurseTraversal(std::set<unique_id_t>& visited, const GraphNode& cu
 
 	for (auto&& input : curNode.inputs())
 	{
-		auto producer = input->producer();
-		if (!visited.count(producer->instanceId()))
+		const auto& producer = input->producer();
+		if (!visited.count(producer.instanceId()))
 		{
-			recurseTraversal(visited, *producer, func);
+			recurseTraversal(visited, producer, func);
 		}
 	}
 }

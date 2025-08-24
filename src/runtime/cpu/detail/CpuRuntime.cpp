@@ -42,7 +42,7 @@ std::vector<std::uint8_t> CpuRuntime::fetchContent(const std::filesystem::path& 
 
 std::shared_ptr<core::IGraphCompiler> CpuRuntime::compiler()
 {
-	return std::make_shared<NaiveGraphCompiler>();
+	return std::make_shared<NaiveGraphCompiler>(*this);
 }
 
 core::Image CpuRuntime::loadImage(const std::filesystem::path& path)

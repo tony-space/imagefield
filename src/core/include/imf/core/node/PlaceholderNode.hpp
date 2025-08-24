@@ -62,7 +62,7 @@ private:
 
 template<typename T>
 PlaceholderNode::PlaceholderNode(TypeQualifier qualifier, T&& value) :
-	m_output(this, TypeID::make<std::decay_t<T>>()),
+	m_output(*this, TypeID::make<std::decay_t<T>>()),
 	m_value(std::forward<T>(value)),
 	m_qualifier(qualifier)
 {

@@ -18,7 +18,7 @@ namespace detail
 template <typename Derived, std::size_t... Is>
 constexpr std::array<DataFlow, sizeof...(Is)> make_outputs_impl(GraphNode* producer, std::index_sequence<Is...>)
 {
-	return { { DataFlow(producer, Derived::output_types[Is])... } };
+	return { { DataFlow(*producer, Derived::output_types[Is])... } };
 }
 
 template <typename Derived>

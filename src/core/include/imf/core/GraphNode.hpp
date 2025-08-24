@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imf/core/iterator_range.hpp>
+#include <imf/core/unique_id_t.hpp>
 
 #include <memory>
 
