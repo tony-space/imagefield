@@ -3,12 +3,18 @@ cmake_minimum_required(VERSION 3.22.1)
 project(IMFRuntimeCpu LANGUAGES CXX)
 
 set(SRC
-	detail/CpuRuntime.cpp
-	detail/CpuTexture.cpp
-
 	include/imf/runtime/cpu/CpuRuntime.hpp
 	include/imf/runtime/cpu/CpuTexture.hpp
 	include/imf/runtime/cpu/pch.hpp
+
+	detail/CpuOperationFactory.cpp
+	detail/CpuOperationFactory.hpp
+	detail/CpuRuntime.cpp
+	detail/CpuTexture.cpp
+	detail/NaiveGraphCompiler.cpp
+	detail/NaiveGraphCompiler.hpp
+
+	detail/operations/CpuTransform.cpp
 )
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SRC})
 

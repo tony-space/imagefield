@@ -1,8 +1,8 @@
 #pragma once
 
+#include <imf/core/EvaluationContext.hpp>
 #include <imf/core/GraphNode.hpp>
 #include <imf/core/IBackendOperation.hpp>
-#include <imf/core/Registers.hpp>
 #include <imf/core/TypeID.hpp>
 #include <imf/core/unique_id_t.hpp>
 
@@ -21,7 +21,7 @@ class ExecutionPlan
 public:
 	struct NodeInfo
 	{
-		Registers::register_id_t location;
+		EvaluationContext::element_id_t location;
 		TypeID dataType;
 	};
 
@@ -41,11 +41,11 @@ public:
 	ExecutionPlan& operator=(const ExecutionPlan&) = delete;
 	ExecutionPlan& operator=(ExecutionPlan&&) noexcept = default;
 
-	Registers::register_id_t placeholderLocation(unique_id_t id) const
+	EvaluationContext::element_id_t placeholderLocation(unique_id_t id) const
 	{
 		return m_placeholderLocations.at(id).location;
 	}
-	Registers::register_id_t sinkLocation(unique_id_t id) const
+	EvaluationContext::element_id_t sinkLocation(unique_id_t id) const
 	{
 		return m_sinkLocations.at(id).location;
 	}

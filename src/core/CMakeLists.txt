@@ -27,9 +27,10 @@ set(SRC
 	include/imf/core/ComponentMapping.hpp
 	include/imf/core/core.hpp
 	include/imf/core/DataFlow.hpp
+	include/imf/core/EvaluationContext.hpp
 	include/imf/core/ExecutionPlan.hpp
 	include/imf/core/glm.hpp
-	Include/imf/core/GraphExecutor.hpp
+	include/imf/core/GraphExecutor.hpp
 	include/imf/core/GraphNode.hpp
 	include/imf/core/GraphNodeFactory.hpp
 	include/imf/core/IBackendOperation.hpp
@@ -39,10 +40,10 @@ set(SRC
 	include/imf/core/iterator_range.hpp
 	include/imf/core/ITexture.hpp
 	include/imf/core/log.hpp
+	include/imf/core/operand.hpp
 	include/imf/core/pch.hpp
 	include/imf/core/pixel_transform.hpp
 	include/imf/core/Region.hpp
-	include/imf/core/Registers.hpp
 	include/imf/core/RuntimeFactory.hpp
 	include/imf/core/TypeID.hpp
 	include/imf/core/TypeQualifier.hpp

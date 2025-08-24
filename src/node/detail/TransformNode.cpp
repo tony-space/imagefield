@@ -4,15 +4,15 @@
 namespace imf::core
 {
 
-class AffineTransformNode : public GraphNodeBase<AffineTransformNode, 2>
+class TransformNode : public GraphNodeBase<TransformNode, 2>
 {
 public:
-	constexpr static std::string_view operation_name = "AffineTransform";
+	constexpr static std::string_view operation_name = "Transform";
 	
 	constexpr static std::string_view input_names[] =
 	{
 		"image",
-		"transformMat"
+		"matrix"
 	};
 
 	constexpr static TypeID input_types[] =
@@ -35,4 +35,4 @@ public:
 
 }
 
-DeclareGraphNode(AffineTransformNode);
+DeclareGraphNode(TransformNode);

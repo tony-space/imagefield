@@ -21,7 +21,7 @@ class TypeID
 public:
 	using value_type = const unique_id_t*;
 
-	const value_type value = nullptr;
+	value_type value = nullptr;
 
 	template <typename T>
 	constexpr static TypeID make() noexcept;

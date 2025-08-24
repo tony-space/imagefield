@@ -13,9 +13,9 @@ int main()
 		auto imgPlaceholder = PlaceholderNode::make_variable(cpuRuntime->loadImage("../assets/png/lenna.png"));
 		auto transformPlaceholder = PlaceholderNode::make_variable(rotate_deg(45.0f));
 
-		auto affine = make_graph_node("AffineTransform");
+		auto affine = make_graph_node("Transform");
 		affine->setInput("image", imgPlaceholder->outputs().front());
-		affine->setInput("transformMat", transformPlaceholder->outputs().front());
+		affine->setInput("matrix", transformPlaceholder->outputs().front());
 
 		auto sink = SinkNode::make(affine->outputs().front());
 		

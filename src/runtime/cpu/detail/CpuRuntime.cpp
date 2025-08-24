@@ -1,9 +1,10 @@
+#include "NaiveGraphCompiler.hpp"
+
 #include <imf/runtime/cpu/CpuRuntime.hpp>
 #include <imf/runtime/cpu/CpuTexture.hpp>
 
 #include <imf/core/Image.hpp>
 #include <imf/core/ITexture.hpp>
-#include <imf/core/IGraphCompiler.hpp>
 #include <imf/core/RuntimeFactory.hpp>
 
 #include <stb/stb_image.h>
@@ -41,16 +42,7 @@ std::vector<std::uint8_t> CpuRuntime::fetchContent(const std::filesystem::path& 
 
 std::shared_ptr<core::IGraphCompiler> CpuRuntime::compiler()
 {
-	class Stub : public core::IGraphCompiler
-	{
-	public:
-		core::ExecutionPlan build(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>&) override
-		{
-			return {};
-		}
-	};
-
-	return std::make_shared<Stub>();
+	return std::make_shared<NaiveGraphCompiler>();
 }
 
 core::Image CpuRuntime::loadImage(const std::filesystem::path& path)

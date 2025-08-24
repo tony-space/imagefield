@@ -3,9 +3,9 @@
 #include <imf/core/node/SinkNode.hpp>
 
 #include <imf/core/DataFlow.hpp>
+#include <imf/core/EvaluationContext.hpp>
 #include <imf/core/ExecutionPlan.hpp>
 #include <imf/core/IRuntime.hpp>
-#include <imf/core/Registers.hpp>
 
 #include <any>
 #include <map>
@@ -62,7 +62,7 @@ private:
 
 	std::shared_ptr<IRuntime> m_runtime;
 	ExecutionPlan m_executionPlan;
-	Registers m_registers;
+	EvaluationContext m_evalContext;
 
 	std::map<unique_id_t, std::any> m_placeholderValues;
 	std::map<unique_id_t, std::any> m_sinkValues;

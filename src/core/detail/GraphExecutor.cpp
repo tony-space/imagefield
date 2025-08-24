@@ -65,12 +65,12 @@ std::vector<GraphExecutor::ExecutionResult> GraphExecutor::run()
 {
 	for (const auto& [placeholderId, nodeInfo] : m_executionPlan.placeholders())
 	{
-		m_registers.set(nodeInfo.location, m_placeholderValues.at(placeholderId));
+		m_evalContext.set(nodeInfo.location, m_placeholderValues.at(placeholderId));
 	}
 
 	for (auto& instruction : m_executionPlan.instructions())
 	{
-		instruction->execute(m_registers);
+		instruction->execute(m_evalContext);
 	}
 
 	const auto& sinks = m_executionPlan.sinks();
@@ -80,7 +80,7 @@ std::vector<GraphExecutor::ExecutionResult> GraphExecutor::run()
 
 	for (auto&& [nodeId, nodeInfo] : sinks)
 	{
-		std::any& value = m_registers.get(nodeInfo.location);
+		std::any& value = m_evalContext.get(nodeInfo.location);
 
 		result.emplace_back(ExecutionResult(
 			std::move(value),
@@ -88,7 +88,7 @@ std::vector<GraphExecutor::ExecutionResult> GraphExecutor::run()
 			nodeId));
 	}
 
-	m_registers.clear();
+	m_evalContext.clear();
 
 	return result;
 }

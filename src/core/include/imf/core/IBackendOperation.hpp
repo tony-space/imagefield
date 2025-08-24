@@ -3,12 +3,12 @@
 namespace imf::core
 {
 
-class Registers;
+class EvaluationContext;
 
 struct IBackendOperation
 {
 	virtual ~IBackendOperation() = default;
-	virtual void execute(Registers& registers) = 0;
+	virtual void execute(EvaluationContext& evalContext) = 0;
 };
 
 }
