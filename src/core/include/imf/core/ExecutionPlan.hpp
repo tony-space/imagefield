@@ -76,7 +76,7 @@ public:
 		m_sinkLocations.clear();
 	}
 private:
-	const std::shared_ptr<const IRuntime> m_runtime;
+	std::shared_ptr<IRuntime> m_runtime;
 	instructions_t m_instructions;
 	node_locations_t m_placeholderLocations;
 	node_locations_t m_sinkLocations;
