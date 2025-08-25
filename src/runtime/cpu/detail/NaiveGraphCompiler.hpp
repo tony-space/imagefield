@@ -6,6 +6,7 @@
 
 #include <set>
 #include <queue>
+#include <vector>
 
 namespace imf::core
 {
@@ -106,6 +107,8 @@ private:
 	void processPlaceholderNode(const core::PlaceholderNode& placeholderNode);
 	void processSinkNode(const core::SinkNode& placeholderNode);
 	void processRegularNode(const core::GraphNode& graphNode);
+
+	core::source_operand convertFlowToOperand(const std::shared_ptr<const core::DataFlow>& input);
 
 	CpuRuntime& m_runtime;
 	EvaluationContextAllocator m_evalCtxAllocator;

@@ -43,9 +43,7 @@ std::shared_ptr<GraphExecutor> GraphExecutor::make_from_range(std::shared_ptr<IR
 		{
 			if (auto placeholder = curNode.as<PlaceholderNode>(); placeholder && placeholder->typeQualifier() == TypeQualifier::Variable)
 			{
-				//result->m_placeholderValues.at(placeholder->instanceId()) = placeholder->value();
-				__debugbreak();
-				result->m_placeholderValues[placeholder->instanceId()] = placeholder->value();
+				result->m_placeholderValues.at(placeholder->instanceId()) = placeholder->value();
 			}
 		});
 	}

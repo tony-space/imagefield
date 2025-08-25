@@ -1,4 +1,5 @@
 #include "NaiveGraphCompiler.hpp"
+#include "CpuOperationFactory.hpp"
 
 #include <imf/runtime/cpu/CpuRuntime.hpp>
 
@@ -74,12 +75,11 @@ static void recurseTraversalBoth(Visited& visited, const core::GraphNode& curNod
 
 core::ExecutionPlan NaiveGraphCompiler::build(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks)
 {
-	(void)m_runtime;
 	validateTopologyStage(sinks);
 	scanAllFlowsPhase(sinks);
 	mainProcessingStage(sinks);
 
-	return {};
+	return { m_runtime.shared_from_this(), std::move(m_instructions), std::move(m_placeholderLocations), std::move(m_sinkLocations) };
 }
 
 void NaiveGraphCompiler::validateTopologyStage(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks)
@@ -238,13 +238,113 @@ void NaiveGraphCompiler::processPlaceholderNode(const core::PlaceholderNode& pla
 	m_placeholderLocations[placeholderNode.instanceId()] = { location, placeholderNode.outputTypes().front() };
 }
 
-void NaiveGraphCompiler::processSinkNode(const core::SinkNode&)
+void NaiveGraphCompiler::processSinkNode(const core::SinkNode& sinkNode)
 {
+	const auto& flow = sinkNode.inputs().front();
+	auto& flowInfo = m_flows.at(flow.get());
 
+	core::EvaluationContext::element_id_t location;
+	if (flowInfo.constant())
+	{
+		location = m_evalCtxAllocator.allocate();
+
+		auto destination = core::destination_operand{ location, flow->dataType() };
+		auto source = core::source_operand{ flowInfo.value(), flow->dataType() };
+
+		auto execution = make_operation("Move",
+			m_runtime,
+			core::destination_operands_range(&destination, &destination + 1),
+			core::source_operands_range(&source, &source + 1));
+		m_instructions.emplace_back(std::move(execution));
+	}
+	else
+	{
+		location = flowInfo.location();
+	}
+	m_sinkLocations[sinkNode.instanceId()] = { location, flow->dataType() };
 }
 
-void NaiveGraphCompiler::processRegularNode(const core::GraphNode&)
+void NaiveGraphCompiler::processRegularNode(const core::GraphNode& curNode)
 {
+	std::vector<core::source_operand> sources;
+	std::vector<core::destination_operand> destinations;
+
+	for (const auto& input : curNode.inputs())
+	{
+		sources.emplace_back(convertFlowToOperand(input));
+	}
+
+	const auto constantInput = std::all_of(sources.begin(), sources.end(), [](const core::source_operand& operand)
+	{
+		return operand.constant();
+	});
+
+	for (const auto& output : curNode.outputs())
+	{
+		if (constantInput)
+		{
+			destinations.emplace_back(core::EvaluationContext::element_id_t(destinations.size()), output.dataType());
+		}
+		else
+		{
+			// TODO what if no one uses one of the outputs?
+			auto& outputFlowInfo = m_flows.at(&output);
+			outputFlowInfo.setLocation(m_evalCtxAllocator.allocate());
+			destinations.emplace_back(outputFlowInfo.location(), output.dataType());
+		}
+	}
+
+	auto backendOperation = make_operation
+	(
+		curNode.operationName(),
+		m_runtime,
+		core::destination_operands_range(destinations.data(), destinations.data() + destinations.size()),
+		core::source_operands_range(sources.data(), sources.data() + sources.size())
+	);
+
+	if (constantInput)
+	{
+		core::EvaluationContext fakeContext;
+		backendOperation->execute(fakeContext);
+
+		auto outputs = curNode.outputs();
+		for (std::size_t i = 0, len = outputs.size(); i != len; ++i)
+		{
+			auto& outputFlowInfo = m_flows.at(&outputs[i]);
+			std::any executionResult = std::move(fakeContext.get(destinations[i].location));
+			outputFlowInfo.setValue(std::move(executionResult));
+		}
+	}
+	else
+	{
+		m_instructions.emplace_back(std::move(backendOperation));
+	}
+}
+
+core::source_operand NaiveGraphCompiler::convertFlowToOperand(const std::shared_ptr<const core::DataFlow>& input)
+{
+	auto& flowInfo = m_flows.at(input.get());
+	flowInfo.usages--;
+
+	if (flowInfo.constant())
+	{
+		if (flowInfo.usages == 0)
+		{
+			return core::source_operand{ std::move(flowInfo.value()), input->dataType() };
+		}
+		else
+		{
+			return core::source_operand{ flowInfo.value(), input->dataType() };
+		}
+	}
+	else
+	{
+		if (flowInfo.usages == 0)
+		{
+			m_evalCtxAllocator.free(flowInfo.location());
+		}
+		return core::source_operand{ flowInfo.location(), input->dataType() };
+	}
 
 }
 
