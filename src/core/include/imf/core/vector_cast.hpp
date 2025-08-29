@@ -50,19 +50,24 @@ constexpr glm::vec4 to_vec4_norm(const glm::vec<3, T, glm::defaultp>& orig)
 template<typename T>
 constexpr glm::vec4 to_vec4_norm(const glm::vec<4, T, glm::defaultp>& orig)
 {
-	auto x = static_cast<float>(orig.x);
-	auto y = static_cast<float>(orig.y);
-	auto z = static_cast<float>(orig.z);
-	auto w = static_cast<float>(orig.w);
 	if constexpr (!std::is_same_v<float, T>)
 	{
+		auto x = static_cast<float>(orig.x);
+		auto y = static_cast<float>(orig.y);
+		auto z = static_cast<float>(orig.z);
+		auto w = static_cast<float>(orig.w);
+
 		x = x / static_cast<float>(std::numeric_limits<T>::max());
 		y = y / static_cast<float>(std::numeric_limits<T>::max());
 		z = z / static_cast<float>(std::numeric_limits<T>::max());
 		w = w / static_cast<float>(std::numeric_limits<T>::max());
-	}
 
-	return { x, y, z, w };
+		return { x, y, z, w };
+	}
+	else
+	{
+		return orig;
+	}
 }
 
 namespace detail

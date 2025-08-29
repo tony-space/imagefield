@@ -82,10 +82,12 @@ std::vector<GraphExecutor::ExecutionResult> GraphExecutor::run()
 	{
 		std::any& value = m_evalContext.get(nodeInfo.location);
 
-		result.emplace_back(ExecutionResult(
+		result.emplace_back(ExecutionResult
+		(
 			std::move(value),
 			nodeInfo.dataType,
-			nodeId));
+			nodeId
+		));
 	}
 
 	m_evalContext.clear();

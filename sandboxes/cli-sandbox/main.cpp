@@ -11,7 +11,7 @@ int main()
 		auto cpuRuntime = make_runtime("cpu");
 		
 		auto imgPlaceholder = PlaceholderNode::make_variable(cpuRuntime->loadImage("../assets/png/lenna.png"));
-		auto transformPlaceholder = PlaceholderNode::make_variable(rotate_deg(45.0f));
+		auto transformPlaceholder = PlaceholderNode::make_variable(scale(1.0f, 1.0f) * rotate_deg(5.0f));
 
 		auto affine = make_graph_node("Transform");
 		affine->setInput("image", imgPlaceholder->outputs().front());
@@ -23,6 +23,7 @@ int main()
 
 		auto executionResult = executor->run();
 		auto result = std::any_cast<Image&&>(std::move(executionResult.front().value));
+		result = cpuRuntime->blit(result);
 
 		const auto texture = std::dynamic_pointer_cast<const IReadMapTexture>(result.texture());
 		texture->mapUnmap([](const TextureData& deviceData)
@@ -34,7 +35,7 @@ int main()
 			convert_pixels(deviceData, TextureFormat::RGBA8, kAlignment, 1, result.data(), dstSize.volumeByteSize);
 
 			stbi_write_png("out.png", (int)deviceData.dim.x, (int)deviceData.dim.y, 4, result.data(), (int)dstSize.rowByteSize);
-		});
+		}, 0);
 
 	}
 	catch (const std::exception& ex)

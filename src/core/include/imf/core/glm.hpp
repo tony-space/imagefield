@@ -4,8 +4,10 @@
 #include <glm/glm.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/component_wise.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/integer.hpp>
+#include <glm/gtc/round.hpp>
+#include <glm/gtx/component_wise.hpp>
 
 namespace imf::core
 {
@@ -28,22 +30,40 @@ inline glm::mat3 rotate_deg(float deg)
 	return rotate_rad(radians);
 }
 
-inline glm::mat3 translate(glm::vec2 t)
+inline glm::mat3 translate(float x, float y)
 {
-	return glm::mat3(
+	return glm::mat3
+	(
 		1.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f,
-		t.x, t.y, 1.0f
+		x, y, 1.0f
+	);
+}
+
+inline glm::mat3 translate(glm::vec2 t)
+{
+	return translate(t.x, t.y);
+}
+
+inline glm::mat3 scale(float x, float y)
+{
+	return glm::mat3
+	(
+		x, 0.0f, 0.0f,
+		0.0f, y, 0.0f,
+		0.0f, 0.0f, 1.0f
 	);
 }
 
 inline glm::mat3 scale(glm::vec2 s)
 {
-	return glm::mat3(
-		s.x, 0.0f, 0.0f,
-		0.0f, s.y, 0.0f,
-		0.0f, 0.0f, 1.0f
-	);
+	return scale(s.x, s.y);
+}
+
+inline glm::vec2 projectToPlane(const glm::mat3& homogenous, const glm::vec2& v)
+{
+	auto p = homogenous * glm::vec3(v, 1.0f);
+	return p.xy() / p.z;
 }
 
 }

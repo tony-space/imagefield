@@ -57,7 +57,6 @@ public:
 	Region& operator=(Region&&) noexcept = default;
 
 	const Triangulation& triangles() const;
-	void transformPoints(const glm::mat3& homogenousMat) noexcept;
 	const BoundingBox& boundingBox() const noexcept;
 	const multi_polygon_t& multiPolygon() const noexcept;
 
@@ -65,13 +64,53 @@ public:
 	operator bool() const noexcept;
 	bool trivialRectangle() const noexcept;
 
+	template<typename Func>
+	void forEachPoint(const Func& func) const
+	{
+		boost::geometry::for_each_point(m_multiPolygon, func);
+	}
 
+	template<typename Func>
+	bool anyOfPoints(const Func& func) const
+	{
+		for (const auto& polygon : m_multiPolygon)
+		{
+			for (const auto& point : polygon.outer())
+			{
+				if (func(point))
+				{
+					return true;
+				}
+			}
+
+			for (const auto& ring : polygon.inners())
+			{
+				for (const auto& point : ring)
+				{
+					if (func(point))
+					{
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	template<typename Func>
+	bool allOfPoints(const Func& func) const
+	{
+		return !anyOfPoints([&](const glm::vec2& v)
+		{
+			return !func(v);
+		});
+	}
 
 	friend Region shape_difference(const Region& lhs, const Region& rhs);
 	friend Region shape_intersection(const Region& lhs, const Region& rhs);
 	friend Region shape_symmetric_difference(const Region& lhs, const Region& rhs);
 	friend Region shape_union(const Region& lhs, const Region& rhs);
-	friend Region shape_make_convex_and_expand_box(const Region& lhs, const glm::vec2& boxSize);
 
 	template <typename Iterator>
 	static Region make_convex(Iterator beginIt, Iterator endIt);
@@ -126,6 +165,5 @@ Region shape_difference(const Region& lhs, const Region& rhs);
 Region shape_intersection(const Region& lhs, const Region& rhs);
 Region shape_symmetric_difference(const Region& lhs, const Region& rhs);
 Region shape_union(const Region& lhs, const Region& rhs);
-Region shape_make_convex_and_expand_box(const Region& lhs, const glm::vec2& boxSize);
 
 }

@@ -21,7 +21,7 @@ struct IRuntime : public std::enable_shared_from_this<IRuntime>
 	virtual std::string_view platform() const noexcept = 0;
 	virtual std::shared_ptr<IGraphCompiler> compiler() = 0;
 	virtual core::Image loadImage(const std::filesystem::path& path) = 0;
-
+	virtual core::Image blit(const core::Image& image) = 0;
 };
 
 }

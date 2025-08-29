@@ -10,10 +10,14 @@ set(SRC
 	detail/CpuOperationFactory.cpp
 	detail/CpuOperationFactory.hpp
 	detail/CpuRuntime.cpp
+	detail/CpuSampler.cpp
+	detail/CpuSampler.hpp
 	detail/CpuTexture.cpp
 	detail/NaiveGraphCompiler.cpp
 	detail/NaiveGraphCompiler.hpp
+	detail/Rasterizer.hpp
 
+	detail/operations/CpuMove.cpp
 	detail/operations/CpuTransform.cpp
 )
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SRC})

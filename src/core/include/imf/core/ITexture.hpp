@@ -35,19 +35,20 @@ struct TextureData
 struct ITexture
 {
 	virtual ~ITexture() = default;
-	virtual glm::uvec3 dim() const = 0;
+	virtual glm::uvec3 dim() const noexcept = 0;
+	virtual TextureFormat format() const noexcept = 0;
 };
 
 struct IReadMapTexture
 {
 	virtual ~IReadMapTexture() = default;
-	[[nodiscard]] virtual const TextureData readMap() const = 0;
+	[[nodiscard]] virtual const TextureData readMap(unsigned level) const = 0;
 	virtual void unmap() const noexcept = 0;
 
 	template <typename Func>
-	decltype(auto) mapUnmap(Func&& f) const
+	decltype(auto) mapUnmap(Func&& f, unsigned level) const
 	{
-		const TextureData textureData = readMap();
+		const TextureData textureData = readMap(level);
 		const unmapper __unmapper(this);
 
 		return std::invoke(std::forward<Func>(f), textureData);

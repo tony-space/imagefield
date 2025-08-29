@@ -23,8 +23,6 @@ static void convert_row(const void* pFrom, void* pTo, size_t pixels)
 	});
 }
 
-using TransformRowFunc = void (*)(const void* from, void* to, size_t pixels);
-
 template<typename InputType, glm::length_t inComp>
 static TransformRowFunc get_convert_func(TextureFormat to)
 {
@@ -44,24 +42,24 @@ static TransformRowFunc get_convert_func(TextureFormat to)
 	throw std::runtime_error("Unknown 'to' texture format");
 }
 
-static TransformRowFunc get_convert_func(TextureFormat from, TextureFormat to)
+}
+
+TransformRowFunc get_convert_func(TextureFormat from, TextureFormat to)
 {
 	switch (from)
 	{
-	case TextureFormat::R8: return get_convert_func<glm::u8, 1>(to);
-	case TextureFormat::RG8: return get_convert_func<glm::u8, 2>(to);
-	case TextureFormat::RGB8: return get_convert_func<glm::u8, 3>(to);
-	case TextureFormat::RGBA8: return get_convert_func<glm::u8, 4>(to);
+	case TextureFormat::R8: return detail::get_convert_func<glm::u8, 1>(to);
+	case TextureFormat::RG8: return detail::get_convert_func<glm::u8, 2>(to);
+	case TextureFormat::RGB8: return detail::get_convert_func<glm::u8, 3>(to);
+	case TextureFormat::RGBA8: return detail::get_convert_func<glm::u8, 4>(to);
 
-	case TextureFormat::R32F: return get_convert_func<glm::f32, 1>(to);
-	case TextureFormat::RG32F: return get_convert_func<glm::f32, 2>(to);
-	case TextureFormat::RGB32F: return get_convert_func<glm::f32, 3>(to);
-	case TextureFormat::RGBA32F: return get_convert_func<glm::f32, 4>(to);
+	case TextureFormat::R32F: return detail::get_convert_func<glm::f32, 1>(to);
+	case TextureFormat::RG32F: return detail::get_convert_func<glm::f32, 2>(to);
+	case TextureFormat::RGB32F: return detail::get_convert_func<glm::f32, 3>(to);
+	case TextureFormat::RGBA32F: return detail::get_convert_func<glm::f32, 4>(to);
 	}
 
 	throw std::runtime_error("Unknown 'from' texure format");
-}
-
 }
 
 ImageSize calc_image_size(TextureFormat format, glm::uvec3 dim, std::size_t rowAlignment, std::size_t planeAlignment)
@@ -95,7 +93,7 @@ void convert_pixels(const TextureData& source, TextureFormat dstFormat, std::siz
 		throw std::runtime_error("invalid destination image data size");
 	}
 
-	detail::TransformRowFunc transformRow = detail::get_convert_func(source.format, dstFormat);
+	TransformRowFunc transformRow = get_convert_func(source.format, dstFormat);
 
 	for (size_t plane = 0; plane < source.dim.z; ++plane)
 	{

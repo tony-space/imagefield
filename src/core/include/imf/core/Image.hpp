@@ -27,20 +27,11 @@ public:
 		LodSettings();
 	};
 
-	/// <summary>
-	/// Defines a <b>finite</b> image in world coordinates.
-	/// </summary>
-	/// <param name="texture">Device-specific memory containing the pixel data</param>
-	/// <param name="boundingBox">Defines the AABB of the image in world coordinates</param>
-	/// <param name="region">Optionally defines the region of the image to be used. Pixels outside the region are black and transparent</param>
-	/// <param name="componentMapping">Optionally defines if the image components must be swizzled during readings</param>
-	/// <param name="lodSettings">Optionally defines level-of-detail limits and bias</param>
-	/// <param name="uvToWorldMat">Optionally defines conversion from normalized texture coordinates [0-1] to world coordinates</param>
 	explicit Image
 	(
 		std::shared_ptr<const ITexture> texture,
 		const BoundingBox& boundingBox,
-		std::shared_ptr<const Region> region = {},
+		std::shared_ptr<const Region> localRegion = {},
 		ComponentMapping componentMapping = {},
 		LodSettings lodSettings = {},
 		std::optional<glm::mat3> uvToWorldMat = {}
@@ -54,18 +45,36 @@ public:
 	Image& operator=(const Image&) = default;
 	Image& operator=(Image&&) = default;
 
+	// Device-specific memory containing image data
 	[[nodiscard]] const auto& texture() const noexcept { return m_texture; }
-	[[nodiscard]] const auto& region() const noexcept { return m_region; }
+
+	// Polygonal domain of definiton in local coordinate system. Outside the region pixels are black and transparent.
+	[[nodiscard]] const auto& localRegion() const noexcept { return m_localRegion; }
+
+	// Bounding box in world space. Consider using localRegion()->boundingBox() for local space bounding box.
 	[[nodiscard]] const auto& boundingBox() const noexcept { return m_boundingBox; }
+
+	// Defines how texture channels should be interpreted during sampling
 	[[nodiscard]] const auto& componentMapping() const noexcept { return m_componentMapping; }
+
+	// Defines level-of-detail settings for texture sampling
 	[[nodiscard]] const auto& lodSettings() const noexcept { return m_lodSettings; }
+
+	// Precomputed isotropic level-of-detail in U and V direction for simple cases of sampling
 	[[nodiscard]] const auto& isotropicLevelOfDetail() const noexcept { return m_isoLevelOfDetail; }
+
+	// Homogenous matrix transforming UV coordinates to world space
 	[[nodiscard]] const auto& uvToWorldMat() const noexcept { return m_uvToWorldMat; }
+
+	// Homogenous matrix transforming world space coordinates to UV space
 	[[nodiscard]] const auto& worldToUvMat() const noexcept { return m_worldToUvMat; }
+
+	// Returns a copy of this image transformed by the given homogenous matrix in world space
+	[[nodiscard]] Image transformed(const glm::mat3& homogenousMat) const;
 
 private:
 	std::shared_ptr<const ITexture> m_texture;
-	std::shared_ptr<const Region> m_region;
+	std::shared_ptr<const Region> m_localRegion;
 	BoundingBox m_boundingBox;
 	ComponentMapping m_componentMapping;
 	LodSettings m_lodSettings;

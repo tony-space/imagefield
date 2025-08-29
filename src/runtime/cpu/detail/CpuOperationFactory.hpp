@@ -40,9 +40,9 @@ std::unique_ptr<imf::core::IBackendOperation> make_##TYPE(\
 {\
 	return std::make_unique<imf::runtime::cpu::TYPE>(runtime, dst, src); \
 }\
-const std::string_view& type_key_##TYPE() noexcept;\
-const std::string_view& type_key_##TYPE() noexcept\
+const std::string_view& operation_name_##TYPE() noexcept;\
+const std::string_view& operation_name_##TYPE() noexcept\
 {\
-	return imf::runtime::cpu::TYPE::type_id;\
+	return imf::runtime::cpu::TYPE::operation_name;\
 }
 

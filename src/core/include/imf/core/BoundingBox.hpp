@@ -2,10 +2,11 @@
 
 #include <imf/core/glm.hpp>
 
+#include <array>
 #include <cstddef>
 #include <initializer_list>
-#include <stdexcept>
 #include <limits>
+#include <stdexcept>
 
 namespace imf::core
 {
@@ -32,14 +33,22 @@ public:
 			add(p);
 		}
 	}
+	
 	constexpr BoundingBox(const glm::uvec2& dim) :
 		m_min(0.0f, 0.0f),
 		m_max(dim)
 	{
 
 	}
+
+	constexpr BoundingBox(float width, float height) :
+		m_min(0.0f, 0.0f),
+		m_max(width, height)
+	{
+	}
+
 	template<size_t idx>
-	constexpr glm::vec2 vec2() const noexcept
+	[[nodiscard]] constexpr glm::vec2 vec2() const noexcept
 	{
 		static_assert(idx < 4);
 
@@ -53,27 +62,43 @@ public:
 			return { m_min.x, m_max.y };
 	}
 
+	[[nodiscard]] constexpr std::array<glm::vec3, 4> homogenousCorners() const noexcept
+	{
+		return
+		{
+			glm::vec3{ vec2<0>(), 1.0f },
+			glm::vec3{ vec2<1>(), 1.0f },
+			glm::vec3{ vec2<2>(), 1.0f },
+			glm::vec3{ vec2<3>(), 1.0f },
+		};
+	}
+
 	[[nodiscard]] constexpr glm::vec2 min() const noexcept
 	{
 		return m_min;
 	}
+	
 	[[nodiscard]] constexpr glm::vec2 max() const noexcept
 	{
 		return m_max;
 	}
+	
 	[[nodiscard]] constexpr glm::vec2 center() const noexcept
 	{
 		return (m_max + m_min) * 0.5f;
 	}
+	
 	[[nodiscard]] constexpr glm::vec2 size() const noexcept
 	{
 		return m_max - m_min;
 	}
+
 	constexpr void add(const glm::vec2& point) noexcept
 	{
 		m_min = glm::min(m_min, point);
 		m_max = glm::max(m_max, point);
 	}
+
 	[[nodiscard]] constexpr bool inside(const glm::vec2& point) const noexcept
 	{
 		auto outside = false;
@@ -85,7 +110,19 @@ public:
 
 		return !outside;
 	}
-	constexpr bool finite() const noexcept
+
+	[[nodiscard]] constexpr bool overlaps(const BoundingBox& other) const noexcept
+	{
+		const auto center1 = center();
+		const auto center2 = other.center();
+
+		auto delta = glm::abs(center1 - center2) * 2.0f;
+		auto totalSize = size() + other.size();
+
+		return (delta.x < totalSize.x) && (delta.y < totalSize.y);
+	}
+
+	[[nodiscard]] constexpr bool finite() const noexcept
 	{
 		if (glm::any(glm::isinf(m_min))) return false;
 		if (glm::any(glm::isinf(m_max))) return false;
@@ -93,8 +130,9 @@ public:
 		return true;
 	}
 	
-	constexpr glm::uvec2 intSize() const
+	[[nodiscard]] constexpr glm::uvec2 intSize() const
 	{
+		assert(finite());
 		if (!finite())
 		{
 			throw std::runtime_error("bounding box is infinite");
@@ -113,12 +151,22 @@ public:
 			transform(m, vec2<3>()),
 		};
 	}
+	
 	[[nodiscard]] static glm::vec2 transform(const glm::mat3& homogenousMat, glm::vec2 v)
 	{
 		const auto p = homogenousMat * glm::vec3(v, 1.0f);
 		v = glm::vec2(p.x / p.z, p.y / p.z);
 		v = glm::round(v * kPrecision) * kEpsilon;
 		return v;
+	}
+
+	[[nodiscard]] static BoundingBox fromOrigin(glm::vec2 origin, glm::uvec2 size)
+	{
+		return BoundingBox
+		{
+			origin,
+			origin + glm::vec2(size)
+		};
 	}
 
 	glm::vec2 m_min{ positive_infinity };

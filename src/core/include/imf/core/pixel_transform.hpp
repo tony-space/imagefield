@@ -31,11 +31,14 @@ constexpr inline std::size_t align_size(std::size_t bytesSize, std::size_t align
 
 struct ImageSize
 {
-	std::size_t pixelByteSize;
-	std::size_t rowByteSize;
-	std::size_t planeByteSize;
-	std::size_t volumeByteSize;
+	std::size_t pixelByteSize{ 0 };
+	std::size_t rowByteSize{ 0 };
+	std::size_t planeByteSize{ 0 };
+	std::size_t volumeByteSize{ 0 };
 };
+
+using TransformRowFunc = void (*)(const void* from, void* to, size_t pixels);
+TransformRowFunc get_convert_func(TextureFormat from, TextureFormat to);
 
 ImageSize calc_image_size(TextureFormat format, glm::uvec3 dim, std::size_t rowAlignment, std::size_t planeAlignment);
 

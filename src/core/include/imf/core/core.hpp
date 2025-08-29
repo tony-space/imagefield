@@ -12,6 +12,7 @@
 #include <imf/core/pixel_transform.hpp>
 #include <imf/core/Region.hpp>
 #include <imf/core/RuntimeFactory.hpp>
+#include <imf/core/ThreadPool.hpp>
 #include <imf/core/TypeID.hpp>
 #include <imf/core/TypeQualifier.hpp>
 #include <imf/core/unique_id_t.hpp>

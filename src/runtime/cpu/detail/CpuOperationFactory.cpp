@@ -7,13 +7,14 @@
 
 #define RegisterType(TYPE)\
 std::unique_ptr<imf::core::IBackendOperation> make_##TYPE(imf::runtime::cpu::CpuRuntime&, const imf::core::destination_operands_range&, const imf::core::source_operands_range&);\
-const std::string_view& type_key_##TYPE(void) noexcept;\
-map[type_key_##TYPE()] = &(make_##TYPE)
+const std::string_view& operation_name_##TYPE(void) noexcept;\
+map[operation_name_##TYPE()] = &(make_##TYPE)
 
 static std::map<std::string_view, imf::runtime::cpu::operation_instantiator_t> register_standard_cpu_operations_impl()
 {
 	std::map<std::string_view, imf::runtime::cpu::operation_instantiator_t> map;
 
+	RegisterType(CpuMove);
 	RegisterType(CpuTransform);
 
 	return map;

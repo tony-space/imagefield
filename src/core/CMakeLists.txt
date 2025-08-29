@@ -9,6 +9,7 @@ set(SRC
 	detail/node/SinkNode.cpp
 
 	detail/DataFlow.cpp
+	detail/EventLoop.cpp
 	detail/GraphExecutor.cpp
 	detail/GraphNode.cpp
 	detail/GraphNodeFactory.cpp
@@ -18,6 +19,7 @@ set(SRC
 	detail/pixel_transform.cpp
 	detail/Region.cpp
 	detail/RuntimeFactory.cpp
+	detail/ThreadPool.cpp
 	detail/unique_id_t.cpp
 
 	include/imf/core/node/PlaceholderNode.hpp
@@ -28,6 +30,7 @@ set(SRC
 	include/imf/core/core.hpp
 	include/imf/core/DataFlow.hpp
 	include/imf/core/EvaluationContext.hpp
+	include/imf/core/EventLoop.hpp
 	include/imf/core/ExecutionPlan.hpp
 	include/imf/core/glm.hpp
 	include/imf/core/GraphExecutor.hpp
@@ -45,6 +48,8 @@ set(SRC
 	include/imf/core/pixel_transform.hpp
 	include/imf/core/Region.hpp
 	include/imf/core/RuntimeFactory.hpp
+	include/imf/core/SamplerDesc.hpp
+	include/imf/core/ThreadPool.hpp
 	include/imf/core/TypeID.hpp
 	include/imf/core/TypeQualifier.hpp
 	include/imf/core/unique_id_t.hpp
