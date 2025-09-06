@@ -20,9 +20,9 @@ class Image
 public:
 	struct LodSettings
 	{
-		glm::vec2 lodMin;
-		glm::vec2 lodMax;
-		glm::vec2 lodBias;
+		float lodMin;
+		float lodMax;
+		float lodBias;
 
 		LodSettings();
 	};
@@ -60,9 +60,6 @@ public:
 	// Defines level-of-detail settings for texture sampling
 	[[nodiscard]] const auto& lodSettings() const noexcept { return m_lodSettings; }
 
-	// Precomputed isotropic level-of-detail in U and V direction for simple cases of sampling
-	[[nodiscard]] const auto& isotropicLevelOfDetail() const noexcept { return m_isoLevelOfDetail; }
-
 	// Homogenous matrix transforming UV coordinates to world space
 	[[nodiscard]] const auto& uvToWorldMat() const noexcept { return m_uvToWorldMat; }
 
@@ -78,12 +75,10 @@ private:
 	BoundingBox m_boundingBox;
 	ComponentMapping m_componentMapping;
 	LodSettings m_lodSettings;
-	glm::vec2 m_isoLevelOfDetail;
 	glm::mat3 m_uvToWorldMat;
 	glm::mat3 m_worldToUvMat;
 
 	void validateGeometry() const;
-	void initLevelOfDetail();
 
 	static glm::mat3 calcUvToWorldMat(const BoundingBox& extent) noexcept;
 };

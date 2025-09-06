@@ -43,6 +43,7 @@ public:
 	void generateMipMaps(core::ThreadPool& pool);
 	MipLevel downsample(core::ThreadPool& pool, const MipLevel& inLevel) const;
 	const MipLevel& at(unsigned level) const;
+	const MipLevel& operator[](unsigned level) const noexcept { return m_mipMaps[level]; }
 	
 	MipLevel& getMsaaLevel();
 	void msaaResolve(core::ThreadPool& pool);

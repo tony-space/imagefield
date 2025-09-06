@@ -6,9 +6,9 @@ namespace imf::core
 {
 
 Image::LodSettings::LodSettings() :
-	lodMin(0.0f, 0.0f),
-	lodMax(1024.0f, 1024.0f),
-	lodBias(0.0f, 0.0f)
+	lodMin(0.0f),
+	lodMax(1024.0f),
+	lodBias(0.0f)
 {
 }
 
@@ -52,7 +52,6 @@ Image::Image
 	m_uvToWorldMat = *uvToWorldMat;
 	m_worldToUvMat = glm::inverse(m_uvToWorldMat);
 
-	initLevelOfDetail();
 	validateGeometry();
 }
 
@@ -60,8 +59,8 @@ void Image::validateGeometry() const
 {
 	const auto consistent = m_localRegion->allOfPoints([&](const glm::vec2& v)
 	{
-		auto projected = m_uvToWorldMat * glm::vec3(v, 1.0f);
-		bool inside = m_boundingBox.inside(projected.xy() / projected.z);
+		auto projected = projectToPlane(m_uvToWorldMat, v);
+		bool inside = m_boundingBox.inside(projected);
 		assert(inside);
 		return inside;
 	});
@@ -85,34 +84,13 @@ glm::mat3 Image::calcUvToWorldMat(const BoundingBox& extent) noexcept
 
 }
 
-void Image::initLevelOfDetail()
-{
-	// see 3.9.11 Texture Minification
-	// https://www.khronos.org/registry/OpenGL/specs/gl/glspec42.core.pdf
-	const auto originalDim = m_texture->dim().xy();
-
-	auto jacobian = glm::transpose(glm::mat2
-	{
-		m_worldToUvMat[0].xy(),
-		m_worldToUvMat[1].xy()
-	});
-	jacobian[0] *= float(originalDim.x);
-	jacobian[1] *= float(originalDim.y);
-
-	const auto dUlenSq = glm::dot(jacobian[0], jacobian[0]);
-	const auto dVlenSq = glm::dot(jacobian[1], jacobian[1]);
-
-	m_isoLevelOfDetail = 0.5f * glm::log2(glm::vec2(dUlenSq, dVlenSq)); //0.5f * log2(x) == log2(sqrt(x))
-}
-
 Image Image::transformed(const glm::mat3& homogenousMatrix) const
 {
 	auto resultBox = BoundingBox{};
 
 	for (auto v : m_boundingBox.homogenousCorners())
 	{
-		v = homogenousMatrix * v;
-		resultBox.add(v.xy() / v.z);
+		resultBox.add(projectToPlane(homogenousMatrix, v));
 	}
 
 	return Image

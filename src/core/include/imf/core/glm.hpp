@@ -62,8 +62,18 @@ inline glm::mat3 scale(glm::vec2 s)
 
 inline glm::vec2 projectToPlane(const glm::mat3& homogenous, const glm::vec2& v)
 {
-	auto p = homogenous * glm::vec3(v, 1.0f);
+	const auto p = homogenous * glm::vec3(v, 1.0f);
 	return p.xy() / p.z;
+}
+
+inline glm::mat4x2 projectToPlane(const glm::mat3& homogenous, glm::mat4x2 v)
+{
+	v[0] = projectToPlane(homogenous, v[0]);
+	v[1] = projectToPlane(homogenous, v[1]);
+	v[2] = projectToPlane(homogenous, v[2]);
+	v[3] = projectToPlane(homogenous, v[3]);
+
+	return v;
 }
 
 }

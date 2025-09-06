@@ -229,33 +229,9 @@ public:
 		const Callable& callback
 	) -> decltype(callback(std::declval<glm::mat4x2>()), void())
 	{
-		rasterize(pool, target, origin, triangulation, localToWorldMat, [&](const glm::mat4x2& pixelQuad, auto&)
+		rasterize(pool, target, origin, triangulation, localToWorldMat, [&](const glm::mat4x2& pixelQuad, int& /*unused coverage mask*/)
 		{
 			return callback(pixelQuad);
-		});
-	}
-
-	template<typename Callable>
-	static auto rasterize
-	(
-		core::ThreadPool& pool,
-		CpuTexture& target,
-		const glm::vec2& origin,
-		const core::Region::Triangulation& triangulation,
-		const glm::mat3& localToWorldMat,
-		const Callable& callback
-	) -> decltype(callback(std::declval<glm::vec2>()), void())
-	{
-		rasterize(pool, target, origin, triangulation, localToWorldMat, [&](const glm::mat4x2& pixelQuad, auto&)
-		{
-			glm::mat4 result;
-
-			result[0] = callback(pixelQuad[0]);
-			result[1] = callback(pixelQuad[1]);
-			result[2] = callback(pixelQuad[2]);
-			result[3] = callback(pixelQuad[3]);
-
-			return result;
 		});
 	}
 };

@@ -9,7 +9,6 @@ enum class AddressMode
 {
 	Repeat,
 	ClampToEdge,
-	MirrorRepeat
 };
 
 enum class MinMagFilter
