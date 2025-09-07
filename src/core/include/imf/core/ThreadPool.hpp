@@ -34,17 +34,29 @@ void ThreadPool::forEachSync(const Func& f, Int items, Int minBatchSize)
 	const auto workersCount = static_cast<Int>(m_workers.size());
 	const auto workPerThread = (std::max)(minBatchSize, (items + workersCount - 1) / workersCount);
 
-	for (Int i = 0; i < workersCount; ++i)
+	for (Int i = 0; i < workersCount; i++)
 	{
-		m_workers[i].enqueue([&f, i, workPerThread, items]()
+		Int rageStart = i * workPerThread;
+		Int rangeEnd = (std::min)(items, rageStart + workPerThread);
+
+		if (rageStart >= rangeEnd)
+			break;
+
+		m_workers[i].enqueue([&f, rageStart, rangeEnd]()
 		{
-			f(i * workPerThread, (std::min)((i + 1) * workPerThread, items));
+			f(rageStart, rangeEnd);
 		});
 	}
 
-	for (auto& w : m_workers)
+	for (Int i = 0; i < workersCount; i++)
 	{
-		w.synchronize();
+		Int rageStart = i * workPerThread;
+		Int rangeEnd = (std::min)(items, rageStart + workPerThread);
+
+		if (rageStart >= rangeEnd)
+			break;
+
+		m_workers[i].synchronize();
 	}
 }
 

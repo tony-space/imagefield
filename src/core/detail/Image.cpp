@@ -73,13 +73,13 @@ void Image::validateGeometry() const
 
 glm::mat3 Image::calcUvToWorldMat(const BoundingBox& extent) noexcept
 {
-	const auto size = extent.intSize();
+	const auto size = extent.size();
 	const auto t = extent.min();
 	return glm::mat3
 	{
-		float(size.x), 0.0f, 0.0f,
-		0.0f, -float(size.y), 0.0f,
-		t.x, t.y + float(size.y), 1.0f
+		size.x, 0.0f, 0.0f,
+		0.0f, -size.y, 0.0f,
+		t.x, t.y + size.y, 1.0f
 	};
 
 }

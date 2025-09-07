@@ -10,7 +10,7 @@ int main()
 
 		auto cpuRuntime = make_runtime("cpu");
 		
-		auto imgPlaceholder = PlaceholderNode::make_variable(cpuRuntime->loadImage("../assets/png/grid.png"));
+		auto imgPlaceholder = PlaceholderNode::make_variable(cpuRuntime->loadImage("../assets/png/lenna.png"));
 		auto transformPlaceholder = PlaceholderNode::make_variable(scale(0.15f, 0.15f) * rotate_deg(5.0f));
 
 		auto affine = make_graph_node("Transform");

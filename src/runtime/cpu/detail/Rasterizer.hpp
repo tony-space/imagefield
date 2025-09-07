@@ -2,7 +2,6 @@
 
 #include <imf/runtime/cpu/CpuTexture.hpp>
 
-#include <imf/core/glm.hpp>
 #include <imf/core/Region.hpp>
 #include <imf/core/ThreadPool.hpp>
 
@@ -54,7 +53,7 @@ public:
 	(
 		core::ThreadPool& pool,
 		CpuTexture& target,
-		const glm::vec2& origin,
+		const core::BoundingBox& targetBox,
 		const core::Region::Triangulation& triangulation,
 		const glm::mat3& localToWorldMat,
 		const Callable& callback
@@ -72,6 +71,15 @@ public:
 		const auto msaaData = msaaLevel.storage.get();
 		const auto readTransformFunc = core::get_convert_func(target.format(), core::TextureFormat::RGBA32F);
 		const auto writeTransformFunc = core::get_convert_func(core::TextureFormat::RGBA32F, target.format());
+
+		// Imaging a one-pixel image rotated to 45 degrees.
+		// The axis-aligned bounding box of the rotated image is a square with a width of sqrt(2) == 1.4142.
+		// This means we need have our final framebuffer to be 2x2 pixels to properly represent the rotated image.
+		// Therefore the framebuffer space is 1.4 times larger than the original bounding box space.
+		// Scaling here is neccesary to squeeze framebuffer space into the bounding box space.
+		const auto framebufferToWorldMat
+			= core::translate(targetBox.min())
+			* core::scale(targetBox.size() / glm::vec2(target.dim().xy()));
 
 		pool.forEachSync([&](int from, int to)
 		{
@@ -106,17 +114,25 @@ public:
 					const auto v2 = core::projectToPlane(localToWorldMat, triangulation.vertices[triangle.z]);
 
 					const auto targetDim = msaaDim / 2;
-					const auto rowIdx1 = msaaRowIdx0 / 2;
-					const auto rowIdx2 = msaaRowIdx2 / 2;
+					const auto rowIdx0 = msaaRowIdx0 / 2;
+					const auto rowIdx1 = msaaRowIdx2 / 2;
 
 					for (int colIdx = 0; colIdx < targetDim.x; colIdx += 2)
 					{
+						const auto framebufferSpaceQuad = glm::mat4x2
+						{
+							glm::vec2(colIdx + 0.5f, targetDim.y - (rowIdx1 + 0.5f)),
+							glm::vec2(colIdx + 1.5f, targetDim.y - (rowIdx1 + 0.5f)),
+							glm::vec2(colIdx + 0.5f, targetDim.y - (rowIdx0 + 0.5f)),
+							glm::vec2(colIdx + 1.5f, targetDim.y - (rowIdx0 + 0.5f))
+						};
+
 						const auto pixelPosQuad = glm::mat4x2
 						{
-							origin + glm::vec2(colIdx + 0.5f, (targetDim.y - 1) - (rowIdx2 + 0.5f)),
-							origin + glm::vec2(colIdx + 1.5f, (targetDim.y - 1) - (rowIdx2 + 0.5f)),
-							origin + glm::vec2(colIdx + 0.5f, (targetDim.y - 1) - (rowIdx1 + 0.5f)),
-							origin + glm::vec2(colIdx + 1.5f, (targetDim.y - 1) - (rowIdx1 + 0.5f))
+							(framebufferToWorldMat * glm::vec3(framebufferSpaceQuad[0], 1.0f)).xy(),
+							(framebufferToWorldMat * glm::vec3(framebufferSpaceQuad[1], 1.0f)).xy(),
+							(framebufferToWorldMat * glm::vec3(framebufferSpaceQuad[2], 1.0f)).xy(),
+							(framebufferToWorldMat * glm::vec3(framebufferSpaceQuad[3], 1.0f)).xy(),
 						};
 
 						// 4xMSAA * 4 pixels in quad = 16 samples in total
@@ -152,7 +168,7 @@ public:
 						);
 
 						const auto hasRight = colIdx + 1 < targetDim.x;
-						const auto hasBottom = rowIdx2 < targetDim.y;
+						const auto hasBottom = rowIdx1 < targetDim.y;
 
 						// pixel quad layout:
 						// 2 3
@@ -223,13 +239,13 @@ public:
 	(
 		core::ThreadPool& pool,
 		CpuTexture& target,
-		const glm::vec2& origin,
+		const core::BoundingBox& targetBox,
 		const core::Region::Triangulation& triangulation,
 		const glm::mat3& localToWorldMat,
 		const Callable& callback
 	) -> decltype(callback(std::declval<glm::mat4x2>()), void())
 	{
-		rasterize(pool, target, origin, triangulation, localToWorldMat, [&](const glm::mat4x2& pixelQuad, int& /*unused coverage mask*/)
+		rasterize(pool, target, targetBox, triangulation, localToWorldMat, [&](const glm::mat4x2& pixelQuad, int& /*unused coverage mask*/)
 		{
 			return callback(pixelQuad);
 		});

@@ -86,15 +86,15 @@ core::Image CpuRuntime::loadImage(const std::filesystem::path& path)
 
 core::Image CpuRuntime::blit(const core::Image& image)
 {
-	const auto& srcBox = image.boundingBox();
-	const auto targetDim = srcBox.intSize();
+	const auto& targetBox = image.boundingBox();
+	const auto targetDim = targetBox.textureSize();
 	auto targetTexture = std::make_shared<CpuTexture>(targetDim, m_workingFormat);
 	
 	auto desc = core::SamplerDesc{};
 	//desc.magFilter = core::MinMagFilter::Nearest;
 
 	const auto sampler = CpuSampler(*this, image, desc);
-	Rasterizer::rasterize(threadPool(), *targetTexture, srcBox.min(), image.localRegion()->triangles(), image.uvToWorldMat(),
+	Rasterizer::rasterize(threadPool(), *targetTexture, targetBox, image.localRegion()->triangles(), image.uvToWorldMat(),
 	[&](const glm::mat4x2& pixelQuad)
 	{
 		return sampler.sample(pixelQuad);
@@ -104,7 +104,8 @@ core::Image CpuRuntime::blit(const core::Image& image)
 	return core::Image
 	(
 		std::move(targetTexture),
-		core::BoundingBox::fromOrigin(srcBox.min(), targetDim)
+		//core::BoundingBox::fromOrigin(targetBox.min(), targetDim)
+		targetBox
 	);
 }
 
