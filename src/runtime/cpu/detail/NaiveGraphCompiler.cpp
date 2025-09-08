@@ -5,6 +5,7 @@
 
 #include <imf/core/node/PlaceholderNode.hpp>
 #include <imf/core/node/SinkNode.hpp>
+#include <imf/core/log.hpp>
 
 namespace imf::runtime::cpu
 {
@@ -75,15 +76,21 @@ static void recurseTraversalBoth(Visited& visited, const core::GraphNode& curNod
 
 core::ExecutionPlan NaiveGraphCompiler::build(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks)
 {
+	core::log::info("compiler") << "compiling graph for " << m_runtime.platform() << " platform using NaiveGraphCompiler";
+
 	validateTopologyStage(sinks);
 	scanAllFlowsPhase(sinks);
 	mainProcessingStage(sinks);
+
+	core::log::info("compiler") << "compilation complete";
 
 	return { m_runtime.shared_from_this(), std::move(m_instructions), std::move(m_placeholderLocations), std::move(m_sinkLocations) };
 }
 
 void NaiveGraphCompiler::validateTopologyStage(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks)
 {
+	core::log::info("compiler") << "\tvalidating graph topology";
+
 	auto visited = std::set<core::unique_id_t>{};
 	auto breadcrumbs = std::set<core::unique_id_t>{};
 	for (const auto& sink : sinks)
@@ -129,6 +136,8 @@ void NaiveGraphCompiler::validateTopologyStage(const core::iterator_range<const 
 
 void NaiveGraphCompiler::scanAllFlowsPhase(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks)
 {
+	core::log::info("compiler") << "\tindexing graph edges";
+
 	auto visited = std::set<core::unique_id_t>{};
 	for (const auto& sink : sinks)
 	{
@@ -194,6 +203,7 @@ void NaiveGraphCompiler::scanAllFlowsPhase(const core::iterator_range<const std:
 
 void NaiveGraphCompiler::mainProcessingStage(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks)
 {
+	core::log::info("compiler") << "\tsorting topologically";
 	auto visited = std::set<core::unique_id_t>{};
 
 	for (const auto& sink : sinks)
@@ -274,14 +284,19 @@ void NaiveGraphCompiler::processRegularNode(const core::GraphNode& curNode)
 		sources.emplace_back(convertFlowToOperand(input));
 	}
 
-	const auto constantInput = std::all_of(sources.begin(), sources.end(), [](const core::source_operand& operand)
+	const auto constantInputs = std::all_of(sources.begin(), sources.end(), [](const core::source_operand& operand)
 	{
 		return operand.constant();
 	});
 
+	if (constantInputs)
+	{
+		core::log::info("compiler") << "\tFound constant node " << curNode.operationName();
+	}
+
 	for (const auto& output : curNode.outputs())
 	{
-		if (constantInput)
+		if (constantInputs)
 		{
 			destinations.emplace_back(core::EvaluationContext::element_id_t(destinations.size()), output.dataType());
 		}
@@ -302,8 +317,10 @@ void NaiveGraphCompiler::processRegularNode(const core::GraphNode& curNode)
 		core::source_operands_range(sources.data(), sources.data() + sources.size())
 	);
 
-	if (constantInput)
+	if (constantInputs)
 	{
+		core::log::info("compiler") << "\t\tprecomputing constant result";
+
 		core::EvaluationContext fakeContext;
 		backendOperation->execute(fakeContext);
 

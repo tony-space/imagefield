@@ -4,6 +4,7 @@
 #include <imf/core/GraphExecutor.hpp>
 #include <imf/core/GraphNodeFactory.hpp>
 #include <imf/core/IGraphCompiler.hpp>
+#include <imf/core/log.hpp>
 
 #include <set>
 

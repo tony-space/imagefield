@@ -7,6 +7,7 @@
 
 #include <imf/core/Image.hpp>
 #include <imf/core/ITexture.hpp>
+#include <imf/core/log.hpp>
 #include <imf/core/RuntimeFactory.hpp>
 
 #include <stb/stb_image.h>
@@ -28,11 +29,13 @@ namespace imf::runtime::cpu
 
 CpuRuntime::CpuRuntime(const core::IRuntime::init_config_t&)
 {
-
+	core::log::info("runtime") << "cpu runtime initialized";
 }
 
 std::vector<std::uint8_t> CpuRuntime::fetchContent(const std::filesystem::path& path)
 {
+	core::log::info("runtime") << "reading binary content from: " << path.string();
+
 	std::ifstream stream(path, std::ios_base::binary);
 	assert(!stream.fail());
 	if (stream.fail())
@@ -51,6 +54,8 @@ std::shared_ptr<core::IGraphCompiler> CpuRuntime::compiler()
 core::Image CpuRuntime::loadImage(const std::filesystem::path& path)
 {
 	const auto rawData = fetchContent(path);
+	
+	core::log::info("runtime") << "making CPU-based image";
 
 	int width;
 	int height;
@@ -104,7 +109,6 @@ core::Image CpuRuntime::blit(const core::Image& image)
 	return core::Image
 	(
 		std::move(targetTexture),
-		//core::BoundingBox::fromOrigin(targetBox.min(), targetDim)
 		targetBox
 	);
 }
