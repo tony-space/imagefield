@@ -138,19 +138,18 @@ CpuTexture::MipLevel CpuTexture::downsample(core::ThreadPool& pool, const MipLev
 				const auto b = rowBuffer[rightmost];
 				const auto c = rowBuffer[inLevel.dim.x + x * 2];
 				const auto d = rowBuffer[inLevel.dim.x + rightmost];
-				
-				glm::vec4 avg(0.0f);
-				
-				float count = 0.0f;
 
-				if (a.a > 0.0f) { avg += a; count += 1.0f; }
-				if (b.a > 0.0f) { avg += b; count += 1.0f; }
-				if (c.a > 0.0f) { avg += c; count += 1.0f; }
-				if (d.a > 0.0f) { avg += d; count += 1.0f; }
-				if (count > 0.0f)
+				auto avg = glm::vec4(0.0f);
+
+				const auto alphaSum = a.a + b.a + c.a + d.a;
+				if (alphaSum > 0.0f)
 				{
-					avg = glm::vec4(avg.rgb() / count, avg.a / 4.0f);
+					avg.r = (a.r * a.a + b.r * b.a + c.r * c.a + d.r * d.a) / alphaSum;
+					avg.g = (a.g * a.a + b.g * b.a + c.g * c.a + d.g * d.a) / alphaSum;
+					avg.b = (a.b * a.a + b.b * b.a + c.b * c.a + d.b * d.a) / alphaSum;
+					avg.a = alphaSum * 0.25f;
 				}
+				
 				rowBuffer[x] = avg;
 			}
 
