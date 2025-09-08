@@ -4,6 +4,7 @@ project(test-suits LANGUAGES CXX)
 
 set(SRC
 	detail/basic-test-suite.cpp
+	detail/cpu-rasterizer-suite.cpp 
 
 	include/imf/tests/pch.hpp
 )
