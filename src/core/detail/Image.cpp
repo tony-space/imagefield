@@ -104,4 +104,17 @@ Image Image::transformed(const glm::mat3& homogenousMatrix) const
 	);
 }
 
+Image Image::setComponentMapping(const ComponentMapping& mapping) const&
+{
+	auto copy = *this;
+	copy.m_componentMapping = mapping;
+	return copy;
+}
+
+Image Image::setComponentMapping(const ComponentMapping& mapping)&&
+{
+	this->m_componentMapping = mapping;
+	return std::move(*this);
+}
+
 }

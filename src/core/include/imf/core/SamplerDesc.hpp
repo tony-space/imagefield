@@ -34,8 +34,6 @@ struct SamplerDesc
 	AddressMode tAddressMode = AddressMode::ClampToEdge;
 	AddressMode rAddressMode = AddressMode::ClampToEdge;
 
-	ComponentMapping componentMapping;
-
 	unsigned char maxAnisotropy = 8;
 
 	friend bool operator== (const SamplerDesc& lhs, const SamplerDesc& rhs) noexcept;
@@ -50,7 +48,6 @@ inline bool operator== (const SamplerDesc& lhs, const SamplerDesc& rhs) noexcept
 		lhs.sAddressMode == rhs.sAddressMode &&
 		lhs.tAddressMode == rhs.tAddressMode &&
 		lhs.rAddressMode == rhs.rAddressMode &&
-		lhs.componentMapping == rhs.componentMapping &&
 		lhs.maxAnisotropy == rhs.maxAnisotropy;
 }
 

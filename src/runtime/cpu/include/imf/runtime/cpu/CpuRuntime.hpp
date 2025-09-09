@@ -17,6 +17,7 @@ public:
 	std::string_view platform() const noexcept override { return "cpu"; }
 	std::shared_ptr<core::IGraphCompiler> compiler() override;
 	core::Image loadImage(const std::filesystem::path& path) override;
+	void saveImage(core::Image image, const std::filesystem::path& path) override;
 	core::Image blit(const core::Image& image) override;
 
 	void setWorkingFormat(core::TextureFormat format) override { m_workingFormat = format; }

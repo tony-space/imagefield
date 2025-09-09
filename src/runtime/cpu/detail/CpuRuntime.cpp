@@ -11,6 +11,7 @@
 #include <imf/core/RuntimeFactory.hpp>
 
 #include <stb/stb_image.h>
+#include <stb/stb_image_write.h>
 
 #include <fstream>
 
@@ -86,7 +87,24 @@ core::Image CpuRuntime::loadImage(const std::filesystem::path& path)
 		stbi_image_free(data);
 		throw;
 	}
+}
 
+void CpuRuntime::saveImage(core::Image image, const std::filesystem::path& path)
+{
+	image = blit(image);
+
+	const auto texture = std::dynamic_pointer_cast<const core::IReadMapTexture>(image.texture());
+
+	texture->mapUnmap([&](const core::TextureData& deviceData)
+	{
+		constexpr static std::size_t kAlignment = 32;
+		const auto dstSize = core::calc_image_size(core::TextureFormat::RGBA8, deviceData.dim, kAlignment, 1);
+		auto result = std::vector<uint8_t>(dstSize.volumeByteSize);
+
+		convert_pixels(deviceData, core::TextureFormat::RGBA8, kAlignment, 1, result.data(), dstSize.volumeByteSize);
+
+		stbi_write_png(path.string().c_str(), (int)deviceData.dim.x, (int)deviceData.dim.y, 4, result.data(), (int)dstSize.rowByteSize);
+	}, 0);
 }
 
 core::Image CpuRuntime::blit(const core::Image& image)
@@ -95,10 +113,8 @@ core::Image CpuRuntime::blit(const core::Image& image)
 	const auto targetDim = targetBox.textureSize();
 	auto targetTexture = std::make_shared<CpuTexture>(targetDim, m_workingFormat);
 	
-	auto desc = core::SamplerDesc{};
-	//desc.magFilter = core::MinMagFilter::Nearest;
+	const auto sampler = CpuSampler(*this, image);
 
-	const auto sampler = CpuSampler(*this, image, desc);
 	Rasterizer::rasterize(threadPool(), *targetTexture, targetBox, image.localRegion()->triangles(), image.uvToWorldMat(),
 	[&](const glm::mat4x2& pixelQuad)
 	{
@@ -106,6 +122,7 @@ core::Image CpuRuntime::blit(const core::Image& image)
 	});
 
 	targetTexture->msaaResolve(threadPool());
+
 	return core::Image
 	(
 		std::move(targetTexture),

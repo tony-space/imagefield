@@ -83,13 +83,16 @@ core::ExecutionPlan NaiveGraphCompiler::build(const core::iterator_range<const s
 	mainProcessingStage(sinks);
 
 	core::log::info("compiler") << "compilation complete";
+	core::log::info("compiler") << "\t|-instructons: " << m_instructions.size();
+	core::log::info("compiler") << "\t|-active placeholders: " << m_placeholderLocations.size();
+	core::log::info("compiler") << "\t|-active sinks: " << m_sinkLocations.size();
 
 	return { m_runtime.shared_from_this(), std::move(m_instructions), std::move(m_placeholderLocations), std::move(m_sinkLocations) };
 }
 
 void NaiveGraphCompiler::validateTopologyStage(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks)
 {
-	core::log::info("compiler") << "\tvalidating graph topology";
+	core::log::info("compiler") << "\t|-validating graph topology";
 
 	auto visited = std::set<core::unique_id_t>{};
 	auto breadcrumbs = std::set<core::unique_id_t>{};
@@ -136,7 +139,7 @@ void NaiveGraphCompiler::validateTopologyStage(const core::iterator_range<const 
 
 void NaiveGraphCompiler::scanAllFlowsPhase(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks)
 {
-	core::log::info("compiler") << "\tindexing graph edges";
+	core::log::info("compiler") << "\t|-indexing graph edges";
 
 	auto visited = std::set<core::unique_id_t>{};
 	for (const auto& sink : sinks)
@@ -203,7 +206,7 @@ void NaiveGraphCompiler::scanAllFlowsPhase(const core::iterator_range<const std:
 
 void NaiveGraphCompiler::mainProcessingStage(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks)
 {
-	core::log::info("compiler") << "\tsorting topologically";
+	core::log::info("compiler") << "\t|-sorting topologically";
 	auto visited = std::set<core::unique_id_t>{};
 
 	for (const auto& sink : sinks)
@@ -291,7 +294,7 @@ void NaiveGraphCompiler::processRegularNode(const core::GraphNode& curNode)
 
 	if (constantInputs)
 	{
-		core::log::info("compiler") << "\tFound constant node " << curNode.operationName();
+		core::log::info("compiler") << "\t|-Found constant node " << curNode.operationName();
 	}
 
 	for (const auto& output : curNode.outputs())
@@ -319,7 +322,7 @@ void NaiveGraphCompiler::processRegularNode(const core::GraphNode& curNode)
 
 	if (constantInputs)
 	{
-		core::log::info("compiler") << "\t\tprecomputing constant result";
+		core::log::info("compiler") << "\t\t|-precomputing constant result";
 
 		core::EvaluationContext fakeContext;
 		backendOperation->execute(fakeContext);

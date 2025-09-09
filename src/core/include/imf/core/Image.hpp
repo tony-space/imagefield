@@ -69,6 +69,12 @@ public:
 	// Returns a copy of this image transformed by the given homogenous matrix in world space
 	[[nodiscard]] Image transformed(const glm::mat3& homogenousMat) const;
 
+	// Returns a copy of this image with the given component mapping
+	[[nodiscard]] Image setComponentMapping(const ComponentMapping& mapping) const &;
+	
+	// Sets the component mapping of this image and returns it
+	[[nodiscard]] Image setComponentMapping(const ComponentMapping& mapping) &&;
+
 private:
 	std::shared_ptr<const ITexture> m_texture;
 	std::shared_ptr<const Region> m_localRegion;

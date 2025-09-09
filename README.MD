@@ -43,7 +43,7 @@ Available features:
 *   `Image` concept for representing backend-agnostic images.
 *   `Region` concept to represent an image's Domain of Definition (DOD). `Core Image` uses a similar concept to define the area outside of which the image is considered black and transparent.
 *   `NaiveGraphCompiler` – a backend-agnostic graph compiler that produces a sequence of operations for a backend.
-*   `CpuBackend` – a CPU backend that executes operations.
+*   `CpuRuntime` – a CPU backend that provides graph compiler and executable low-level operations.
 *   `Rasterizer` – a CPU-based MSAA x4 rasterizer for `Region` shapes.
 
 ## Prerequisites to build

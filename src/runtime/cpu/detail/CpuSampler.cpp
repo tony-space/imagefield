@@ -40,6 +40,7 @@ CpuSampler::CpuSampler(CpuRuntime& runtime, const core::Image& img, const core::
 	m_wrapFuncT = getWrapFunc(desc.tAddressMode);
 	m_magSamplingFunc = getMagSamplingFunc(desc.magFilter);
 	m_minSamplingFunc = getMinSamplingFunc(desc.minFilter, desc.mipFilter);
+	m_swizzleFunc = ComponentSwizzleFunctor{ img.componentMapping() };
 }
 
 glm::mat4 CpuSampler::sample(const glm::mat4x2& worldQuad) const noexcept
@@ -76,7 +77,7 @@ glm::mat4 CpuSampler::sample(const glm::mat4x2& worldQuad) const noexcept
 	const auto isoLevelOfDetail = 0.5f * glm::log2(glm::vec2(dUlenSq, dVlenSq));
 	const auto level = glm::clamp(glm::compMax(isoLevelOfDetail) + m_lodSettings.lodBias, m_lodSettings.lodMin, m_lodSettings.lodMax);
 
-	return sample(normalizedTcQuad, level);
+	return m_swizzleFunc(sample(normalizedTcQuad, level));
 }
 
 glm::mat4 CpuSampler::sample(glm::mat4x2 normalizedTcQuad, float lod) const noexcept
@@ -276,6 +277,65 @@ CpuSampler::SamplingFunc CpuSampler::getMinSamplingFunc(core::MinMagFilter minFi
 
 	assert(false);
 	std::terminate();
+}
+
+glm::mat4 CpuSampler::ComponentSwizzleFunctor::operator() (const glm::mat4& m) const noexcept
+{
+	return glm::mat4
+	(
+		(*this)(m[0]),
+		(*this)(m[1]),
+		(*this)(m[2]),
+		(*this)(m[3])
+	);
+}
+
+glm::vec4 CpuSampler::ComponentSwizzleFunctor::operator() (const glm::vec4& v) const noexcept
+{
+	if (mapping == core::ComponentMapping{})
+	{
+		return v;
+	}
+
+	glm::vec4 result(0.0f);
+
+	if (mapping.red <= core::ComponentSwizzle::Alpha)
+	{
+		result[0] = v[static_cast<glm::length_t>(mapping.red)];
+	}
+	else if (mapping.red == core::ComponentSwizzle::One)
+	{
+		result[0] = 1.0f;
+	}
+
+	if (mapping.green <= core::ComponentSwizzle::Alpha)
+	{
+		result[1] = v[static_cast<glm::length_t>(mapping.green)];
+	}
+	else if (mapping.green == core::ComponentSwizzle::One)
+	{
+		result[1] = 1.0f;
+	}
+
+	if (mapping.blue <= core::ComponentSwizzle::Alpha)
+	{
+		result[2] = v[static_cast<glm::length_t>(mapping.blue)];
+	}
+	else if (mapping.blue == core::ComponentSwizzle::One)
+	{
+		result[2] = 1.0f;
+	}
+
+	if (mapping.alpha <= core::ComponentSwizzle::Alpha)
+	{
+		result[3] = v[static_cast<glm::length_t>(mapping.alpha)];
+	}
+	else if (mapping.alpha == core::ComponentSwizzle::One)
+	{
+		result[3] = 1.0f;
+	}
+
+	return result;
 }
 
 }

@@ -3,7 +3,7 @@
 namespace imf::core
 {
 
-enum class ComponentSwizzle
+enum class ComponentSwizzle : unsigned char
 {
 	Red,
 	Green,

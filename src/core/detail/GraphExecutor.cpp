@@ -64,15 +64,21 @@ GraphExecutor::GraphExecutor(std::shared_ptr<IRuntime> runtime, ExecutionPlan&& 
 
 std::vector<GraphExecutor::ExecutionResult> GraphExecutor::run()
 {
+	core::log::info("executor") << "preparing placeholder values";
+
 	for (const auto& [placeholderId, nodeInfo] : m_executionPlan.placeholders())
 	{
 		m_evalContext.set(nodeInfo.location, m_placeholderValues.at(placeholderId));
 	}
 
+	core::log::info("executor") << "executing " << m_executionPlan.instructions().size() << " instructions";
+
 	for (auto& instruction : m_executionPlan.instructions())
 	{
 		instruction->execute(m_evalContext);
 	}
+
+	core::log::info("executor") << "execution complete";
 
 	const auto& sinks = m_executionPlan.sinks();
 
