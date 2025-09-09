@@ -155,7 +155,7 @@ CpuTexture::MipLevel CpuTexture::downsample(core::ThreadPool& pool, const MipLev
 
 			writeFunc(rowBuffer.data(), outRowPtr, resultDim.x);
 		}
-	}, (inLevel.dim.y + 1) / 2); // (5 rows + 1) / 2 = 3 batches
+	}, resultDim.y);
 
 	return
 	{

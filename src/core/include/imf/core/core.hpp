@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imf/core/BoundingBox.hpp>
+#include <imf/core/ColorSpace.hpp>
 #include <imf/core/DataFlow.hpp>
 #include <imf/core/GraphExecutor.hpp>
 #include <imf/core/GraphNode.hpp>
@@ -12,6 +13,7 @@
 #include <imf/core/pixel_transform.hpp>
 #include <imf/core/Region.hpp>
 #include <imf/core/RuntimeFactory.hpp>
+#include <imf/core/TextureFormat.hpp>
 #include <imf/core/ThreadPool.hpp>
 #include <imf/core/TypeID.hpp>
 #include <imf/core/TypeQualifier.hpp>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imf/core/iterator_range.hpp>
+#include <imf/core/TypeQualifier.hpp>
 #include <imf/core/unique_id_t.hpp>
 
 #include <memory>
@@ -31,7 +32,8 @@ public:
 
 	//setters
 	virtual void setInput(const std::string_view& name, const DataFlow& flow) = 0;
-
+	
+	template<typename T> void setInput(std::string_view name, TypeQualifier qualifier, T&& value);
 	template<typename T> T* as();
 	template<typename T> const T* as() const;
 	template<typename T> T& is();
@@ -64,6 +66,7 @@ const T* GraphNode::as() const
 template<typename T>
 T& GraphNode::is()
 {
+	assert(T::operation_name == operationName());
 	if (T::operation_name == operationName())
 	{
 		return static_cast<T&>(*this);
@@ -75,6 +78,7 @@ T& GraphNode::is()
 template<typename T>
 const T& GraphNode::is() const
 {
+	assert(T::operation_name == operationName());
 	if (T::operation_name == operationName())
 	{
 		return static_cast<const T&>(*this);

@@ -14,6 +14,7 @@ static std::map<std::string_view, imf::runtime::cpu::operation_instantiator_t> r
 {
 	std::map<std::string_view, imf::runtime::cpu::operation_instantiator_t> map;
 
+	RegisterType(CpuColorSpaceConvert);
 	RegisterType(CpuMove);
 	RegisterType(CpuTransform);
 

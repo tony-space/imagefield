@@ -1,7 +1,7 @@
 #pragma once
 
 #include <imf/core/Image.hpp>
-#include <imf/core/ITexture.hpp>
+#include <imf/core/TextureFormat.hpp>
 
 #include <any>
 #include <filesystem>

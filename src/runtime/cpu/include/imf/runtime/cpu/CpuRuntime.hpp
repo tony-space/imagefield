@@ -1,7 +1,7 @@
 #pragma once
 
 #include <imf/core/IRuntime.hpp>
-#include <imf/core/ITexture.hpp>
+#include <imf/core/TextureFormat.hpp>
 #include <imf/core/ThreadPool.hpp>
 
 namespace imf::runtime::cpu

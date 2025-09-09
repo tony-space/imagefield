@@ -8,6 +8,7 @@ set(SRC
 	detail/node/PlaceholderNode.cpp
 	detail/node/SinkNode.cpp
 
+	detail/ColorSpace.cpp
 	detail/DataFlow.cpp
 	detail/EventLoop.cpp
 	detail/GraphExecutor.cpp
@@ -26,6 +27,7 @@ set(SRC
 	include/imf/core/node/SinkNode.hpp
 
 	include/imf/core/BoundingBox.hpp
+	include/imf/core/ColorSpace.hpp
 	include/imf/core/ComponentMapping.hpp
 	include/imf/core/core.hpp
 	include/imf/core/DataFlow.hpp
@@ -49,6 +51,7 @@ set(SRC
 	include/imf/core/Region.hpp
 	include/imf/core/RuntimeFactory.hpp
 	include/imf/core/SamplerDesc.hpp
+	include/imf/core/TextureFormat.hpp
 	include/imf/core/ThreadPool.hpp
 	include/imf/core/TypeID.hpp
 	include/imf/core/TypeQualifier.hpp
