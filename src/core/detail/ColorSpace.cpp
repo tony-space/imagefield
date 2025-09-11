@@ -27,14 +27,14 @@ const ColorSpace ColorSpace::sRGB
 	{
 		// An approximation of the sRGB transfer function
 		// https://developer.android.com/reference/android/graphics/ColorSpace.Named#SRGB
-		return glm::pow(v, glm::vec3(1.0f / 2.2f));
+		return glm::pow(glm::clamp(v, glm::vec3(0.0f), glm::vec3(1.0f)), glm::vec3(1.0f / 2.2f));
 	},
 
 	+[](const glm::vec3& v) noexcept
 	{
 		// An approximation of the sRGB transfer function
 		// https://developer.android.com/reference/android/graphics/ColorSpace.Named#SRGB
-		return glm::pow(v, glm::vec3(2.2f));
+		return glm::pow(glm::clamp(v, glm::vec3(0.0f), glm::vec3(1.0f)), glm::vec3(2.2f));
 	}
 };
 

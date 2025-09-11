@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imf/core/Image.hpp>
+#include <imf/core/SamplerDesc.hpp>
 #include <imf/core/TextureFormat.hpp>
 
 #include <any>
@@ -23,7 +24,7 @@ struct IRuntime : public std::enable_shared_from_this<IRuntime>
 	virtual std::shared_ptr<IGraphCompiler> compiler() = 0;
 	virtual core::Image loadImage(const std::filesystem::path& path) = 0;
 	virtual void saveImage(core::Image image, const std::filesystem::path& path) = 0;
-	virtual core::Image blit(const core::Image& image) = 0;
+	virtual core::Image blit(const core::Image& image, const SamplerDesc& desc = {}) = 0;
 
 	virtual void setWorkingFormat(TextureFormat format) = 0;
 	virtual TextureFormat workingFormat() const noexcept = 0;

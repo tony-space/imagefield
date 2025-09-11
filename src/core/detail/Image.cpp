@@ -71,10 +71,10 @@ void Image::validateGeometry() const
 	}
 }
 
-glm::mat3 Image::calcUvToWorldMat(const BoundingBox& extent) noexcept
+glm::mat3 Image::calcUvToWorldMat(const BoundingBox& box) noexcept
 {
-	const auto size = extent.size();
-	const auto t = extent.min();
+	const auto size = box.size();
+	const auto t = box.min();
 	return glm::mat3
 	{
 		size.x, 0.0f, 0.0f,

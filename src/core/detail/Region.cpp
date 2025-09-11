@@ -140,25 +140,29 @@ Region::operator bool() const noexcept
 
 bool Region::trivialRectangle() const noexcept
 {
-	if (m_multiPolygon.size() != 1) return false;
-
-	const auto& polygon = m_multiPolygon[0];
-
-	if (polygon.inners().size() != 0) return false;
-	if (polygon.outer().size() != 5) return false;
-	if (polygon.outer().front() != polygon.outer().back()) return false;
-
-	const auto& polygonBoundingBox = boundingBox();
-	for (const auto& p : polygon.outer())
+	if (m_multiPolygon.size() != 1)
 	{
-		bool anyOf =
-			polygonBoundingBox.vec2<0>() == p ||
-			polygonBoundingBox.vec2<1>() == p ||
-			polygonBoundingBox.vec2<2>() == p ||
-			polygonBoundingBox.vec2<3>() == p;
-
-		if (!anyOf) return false;
+		return false;
 	}
+
+	const auto& polygon = m_multiPolygon.front();
+
+	if (polygon.inners().size() != 0)
+	{
+		return false;
+	}
+	if (polygon.outer().size() != 5)
+	{
+		return false;
+	}
+
+	const auto trivialBox = BoundingBox(1.0f, 1.0f);
+	const auto& ring = polygon.outer();
+	if (trivialBox.vec2<0>() != ring[0]) return false;
+	if (trivialBox.vec2<3>() != ring[1]) return false;
+	if (trivialBox.vec2<2>() != ring[2]) return false;
+	if (trivialBox.vec2<1>() != ring[3]) return false;
+	if (trivialBox.vec2<0>() != ring[4]) return false;
 
 	return true;
 }

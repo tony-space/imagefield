@@ -8,6 +8,7 @@ set(SRC
 	include/imf/core/node/GraphNodeBase.hpp
 	include/imf/core/node/pch.hpp
 
+	detail/BicubicUpscaleNode.cpp
 	detail/ColorSpaceConvertNode.cpp
 	detail/TransformNode.cpp
 )

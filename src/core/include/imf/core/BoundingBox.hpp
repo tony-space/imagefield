@@ -130,7 +130,8 @@ public:
 		return true;
 	}
 	
-	[[nodiscard]] constexpr glm::uvec2 textureSize() const
+	template<typename T>
+	[[nodiscard]] constexpr T textureSize() const
 	{
 		assert(finite());
 		if (!finite())
@@ -138,7 +139,7 @@ public:
 			throw std::runtime_error("bounding box is infinite");
 		}
 
-		return glm::ceil(size() * 0.5f) * 2.0f;
+		return T(glm::ceil(size() * 0.5f) * 2.0f);
 	}
 
 	[[nodiscard]] constexpr BoundingBox transform(const glm::mat3& m) const noexcept

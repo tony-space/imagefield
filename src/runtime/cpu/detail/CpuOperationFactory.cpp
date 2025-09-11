@@ -14,6 +14,7 @@ static std::map<std::string_view, imf::runtime::cpu::operation_instantiator_t> r
 {
 	std::map<std::string_view, imf::runtime::cpu::operation_instantiator_t> map;
 
+	RegisterType(CpuBicubicUpscale);
 	RegisterType(CpuColorSpaceConvert);
 	RegisterType(CpuMove);
 	RegisterType(CpuTransform);
@@ -37,7 +38,15 @@ std::unique_ptr<core::IBackendOperation> make_operation(
 	const core::destination_operands_range& dest,
 	const core::source_operands_range& src)
 {
-	return operation_instantiators().at(name)(runtime, dest, src);
+	auto& map = operation_instantiators();
+	auto it = map.find(name);
+	assert(it != map.end());
+	if (it == map.end())
+	{
+		core::log::err("runtime") << "cpu operation '" << name << "' not registered";
+		throw std::invalid_argument("cpu operation not registered");
+	}
+	return it->second(runtime, dest, src);
 }
 
 void register_operation(std::string_view name, operation_instantiator_t instantiator)

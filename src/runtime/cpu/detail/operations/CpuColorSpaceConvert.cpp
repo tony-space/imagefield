@@ -33,7 +33,7 @@ public:
 		const auto conversionMat = toTargetMat * toXYZmat;
 
 		const auto& targetBox = image.boundingBox();
-		const auto targetDim = targetBox.textureSize();
+		const auto targetDim = targetBox.textureSize<glm::uvec2>();
 		auto targetTexture = std::make_shared<CpuTexture>(targetDim, m_runtime.workingFormat());
 
 		const auto sampler = CpuSampler(m_runtime, image);

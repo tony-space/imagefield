@@ -16,7 +16,15 @@ static std::map<std::string_view, graph_node_instantiator_t>& graph_node_instant
 
 std::shared_ptr<GraphNode> make_graph_node(std::string_view name)
 {
-	return graph_node_instantiators().at(name)();
+	auto& map = graph_node_instantiators();
+	auto it = map.find(name);
+	assert(it != map.end());
+	if (it == map.end())
+	{
+		log::err("graph") << "graph node '" << name << "' not registered";
+		throw std::invalid_argument("graph node not registered");
+	}
+	return it->second();
 }
 
 void register_graph_node(std::string_view name, graph_node_instantiator_t instantiator)

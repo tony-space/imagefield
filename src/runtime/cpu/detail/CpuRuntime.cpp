@@ -56,8 +56,6 @@ core::Image CpuRuntime::loadImage(const std::filesystem::path& path)
 {
 	const auto rawData = fetchContent(path);
 	
-	core::log::info("runtime") << "making CPU-based image";
-
 	int width;
 	int height;
 	int channels;
@@ -91,6 +89,8 @@ core::Image CpuRuntime::loadImage(const std::filesystem::path& path)
 
 void CpuRuntime::saveImage(core::Image image, const std::filesystem::path& path)
 {
+	core::log::info("runtime") << "attempting to save image to: " << path.string();
+
 	image = blit(image);
 
 	const auto texture = std::dynamic_pointer_cast<const core::IReadMapTexture>(image.texture());
@@ -107,13 +107,21 @@ void CpuRuntime::saveImage(core::Image image, const std::filesystem::path& path)
 	}, 0);
 }
 
-core::Image CpuRuntime::blit(const core::Image& image)
+core::Image CpuRuntime::blit(const core::Image& image, const core::SamplerDesc& desc)
 {
+	if (image.localRegion()->trivialRectangle() &&
+		image.uvToWorldMat() == core::Image::calcUvToWorldMat(image.boundingBox()) &&
+		desc == core::SamplerDesc{}
+		)
+	{
+		return image;
+	}
+
 	const auto& targetBox = image.boundingBox();
-	const auto targetDim = targetBox.textureSize();
+	const auto targetDim = targetBox.textureSize<glm::uvec2>();
 	auto targetTexture = std::make_shared<CpuTexture>(targetDim, m_workingFormat);
-	
-	const auto sampler = CpuSampler(*this, image);
+
+	const auto sampler = CpuSampler(*this, image, desc);
 
 	Rasterizer::rasterize(threadPool(), *targetTexture, targetBox, image.localRegion()->triangles(), image.uvToWorldMat(),
 	[&](const glm::mat4x2& pixelQuad)

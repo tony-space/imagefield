@@ -15,7 +15,9 @@ class CpuSampler
 public:
 	explicit CpuSampler(CpuRuntime& runtime, const core::Image& img, const core::SamplerDesc& desc = {});
 
+	glm::mat4x2 textureCoords(const glm::mat4x2& worldQuad) const noexcept;
 	glm::mat4 sample(const glm::mat4x2& worldQuad) const noexcept;
+	glm::mat4 sampleByTextureCoords(const glm::mat4x2& normalizedTcQuad) const noexcept;
 private:
 	using wrapFunc = unsigned (*)(long coord, unsigned size) noexcept;
 	using MagSamplingFunc = glm::vec4(*) (const CpuSampler*, const glm::vec2& tc) noexcept;

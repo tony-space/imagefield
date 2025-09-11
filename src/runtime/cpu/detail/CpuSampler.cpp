@@ -43,16 +43,24 @@ CpuSampler::CpuSampler(CpuRuntime& runtime, const core::Image& img, const core::
 	m_swizzleFunc = ComponentSwizzleFunctor{ img.componentMapping() };
 }
 
+glm::mat4x2 CpuSampler::textureCoords(const glm::mat4x2& worldQuad) const noexcept
+{
+	return core::projectToPlane(m_worldToUvMat, worldQuad);
+}
+
 glm::mat4 CpuSampler::sample(const glm::mat4x2& worldQuad) const noexcept
+{
+	return sampleByTextureCoords(textureCoords(worldQuad));
+}
+
+glm::mat4 CpuSampler::sampleByTextureCoords(const glm::mat4x2& normalizedTcQuad) const noexcept
 {
 	// world quad layout
 	// 2 3
 	// 0 1
-
 	// see 3.8.10 Texture Minification
 	// https://registry.khronos.org/OpenGL/specs/es/3.0/es_spec_3.0.pdf#subsection.3.8.10
 	const auto originalDim = glm::vec2(m_cpuTexture->dim().xy());
-	const auto normalizedTcQuad = core::projectToPlane(m_worldToUvMat, worldQuad);
 	const auto baseLevelQuad = glm::mat4x2
 	(
 		normalizedTcQuad[0] * originalDim,

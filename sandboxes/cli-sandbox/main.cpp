@@ -7,21 +7,18 @@ int main()
 		using namespace imf::core;
 
 		auto cpuRuntime = make_runtime("cpu");
-		
-		auto imgPlaceholder = PlaceholderNode::make_variable(cpuRuntime->loadImage("../assets/png/lenna.png"));
-		auto transformPlaceholder = PlaceholderNode::make_variable(scale(0.15f, 0.15f) * rotate_deg(5.0f));
-
+	
 		auto toLinear = make_graph_node("ColorSpaceConvert");
-		toLinear->setInput("image", imgPlaceholder->outputs().front());
+		toLinear->setInput("image", TypeQualifier::Variable, cpuRuntime->loadImage("../assets/png/noise128.png"));
 		toLinear->setInput("sourceColorSpace", TypeQualifier::Constant, color::ColorSpace::sRGB);
 		toLinear->setInput("targetColorSpace", TypeQualifier::Constant, color::ColorSpace::Linear_sRGB);
 
-		auto affine = make_graph_node("Transform");
-		affine->setInput("image", toLinear->outputs().front());
-		affine->setInput("matrix", transformPlaceholder->outputs().front());
+		auto bicubic = make_graph_node("BicubicUpscale");
+		bicubic->setInput("image", toLinear->outputs().front());
+		bicubic->setInput("scale", TypeQualifier::Constant, glm::vec2(8.0f, 8.0f));
 
 		auto toGamma = make_graph_node("ColorSpaceConvert");
-		toGamma->setInput("image", affine->outputs().front());
+		toGamma->setInput("image", bicubic->outputs().front());
 		toGamma->setInput("sourceColorSpace", TypeQualifier::Constant, color::ColorSpace::Linear_sRGB);
 		toGamma->setInput("targetColorSpace", TypeQualifier::Constant, color::ColorSpace::sRGB);
 

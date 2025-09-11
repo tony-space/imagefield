@@ -75,6 +75,7 @@ public:
 	// Sets the component mapping of this image and returns it
 	[[nodiscard]] Image setComponentMapping(const ComponentMapping& mapping) &&;
 
+	static glm::mat3 calcUvToWorldMat(const BoundingBox& box) noexcept;
 private:
 	std::shared_ptr<const ITexture> m_texture;
 	std::shared_ptr<const Region> m_localRegion;
@@ -85,8 +86,6 @@ private:
 	glm::mat3 m_worldToUvMat;
 
 	void validateGeometry() const;
-
-	static glm::mat3 calcUvToWorldMat(const BoundingBox& extent) noexcept;
 };
 
 }

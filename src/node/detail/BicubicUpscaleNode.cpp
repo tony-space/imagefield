@@ -1,24 +1,25 @@
 #include <imf/core/GraphNodeFactory.hpp>
 #include <imf/core/node/GraphNodeBase.hpp>
+#include <imf/core/node/PlaceholderNode.hpp>
 
 namespace imf::core
 {
 
-class TransformNode : public GraphNodeBase<TransformNode, 2>
+class BicubicUpscaleNode final : public GraphNodeBase<BicubicUpscaleNode, 2>
 {
 public:
-	constexpr static std::string_view operation_name = "Transform";
-	
+	constexpr static std::string_view operation_name = "BicubicUpscale";
+
 	constexpr static std::string_view input_names[] =
 	{
 		"image",
-		"matrix"
+		"scale",
 	};
 
 	constexpr static TypeID input_types[] =
 	{
 		TypeID::make<Image>(),
-		TypeID::make<glm::mat3>()
+		TypeID::make<glm::vec2>(),
 	};
 
 	constexpr static std::string_view output_names[] =
@@ -31,13 +32,12 @@ public:
 		TypeID::make<Image>(),
 	};
 
-	TransformNode()
+	BicubicUpscaleNode()
 	{
-		m_inputs[1] = PlaceholderNode::make_constant(glm::mat3(1.0f))->outputs().front().sharedPtr();
+		m_inputs[1] = PlaceholderNode::make_constant(glm::vec2(1.0f))->outputs().front().sharedPtr();
 	}
-	
 };
 
 }
 
-DeclareGraphNode(TransformNode);
+DeclareGraphNode(BicubicUpscaleNode);

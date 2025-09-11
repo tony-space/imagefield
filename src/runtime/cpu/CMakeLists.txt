@@ -17,6 +17,7 @@ set(SRC
 	detail/NaiveGraphCompiler.hpp
 	detail/Rasterizer.hpp
 
+	detail/operations/CpuBicubicUpscale.cpp
 	detail/operations/CpuColorSpaceConvert.cpp
 	detail/operations/CpuMove.cpp
 	detail/operations/CpuTransform.cpp
