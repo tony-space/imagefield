@@ -1,6 +1,7 @@
 #include <imf/core/GraphNodeFactory.hpp>
 #include <imf/core/log.hpp>
 
+#include <cassert>
 #include <map>
 #include <stdexcept>
 

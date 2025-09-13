@@ -34,6 +34,7 @@ set(SRC
 	include/imf/core/EvaluationContext.hpp
 	include/imf/core/EventLoop.hpp
 	include/imf/core/ExecutionPlan.hpp
+	include/imf/core/function_traits.hpp
 	include/imf/core/glm.hpp
 	include/imf/core/GraphExecutor.hpp
 	include/imf/core/GraphNode.hpp

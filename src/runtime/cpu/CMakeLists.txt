@@ -19,6 +19,7 @@ set(SRC
 
 	detail/operations/CpuBicubicUpscale.cpp
 	detail/operations/CpuColorSpaceConvert.cpp
+	detail/operations/CpuFunctor.cpp
 	detail/operations/CpuMove.cpp
 	detail/operations/CpuTransform.cpp
 )
@@ -39,4 +40,4 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER imagefield)
 target_include_directories(${PROJECT_NAME} PUBLIC "include")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE IMF_CXX_FLAGS)
-target_link_libraries(${PROJECT_NAME} PUBLIC ImageField::Core STB)
+target_link_libraries(${PROJECT_NAME} PUBLIC ImageField::Core ImageField::Node STB)

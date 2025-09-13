@@ -5,11 +5,14 @@ project(IMFNode LANGUAGES CXX)
 set(SRC
 	detail/register_standard_graph_nodes.cpp
 
+	include/imf/core/node/FunctorNode.hpp
 	include/imf/core/node/GraphNodeBase.hpp
+	include/imf/core/node/node.hpp
 	include/imf/core/node/pch.hpp
 
 	detail/BicubicUpscaleNode.cpp
 	detail/ColorSpaceConvertNode.cpp
+	detail/FunctorNode.cpp
 	detail/TransformNode.cpp
 )
 

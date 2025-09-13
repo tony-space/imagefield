@@ -1,5 +1,6 @@
 #include <imf/core/GraphNodeFactory.hpp>
 #include <imf/core/node/GraphNodeBase.hpp>
+#include <imf/core/node/PlaceholderNode.hpp>
 
 namespace imf::core
 {

@@ -1,4 +1,4 @@
 #pragma once
 
 #include <imf/core/core.hpp>
-#include <stb/stb_image_write.h>
+#include <imf/core/node/node.hpp>

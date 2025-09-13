@@ -16,6 +16,7 @@ static std::map<std::string_view, imf::runtime::cpu::operation_instantiator_t> r
 
 	RegisterType(CpuBicubicUpscale);
 	RegisterType(CpuColorSpaceConvert);
+	RegisterType(CpuFunctor);
 	RegisterType(CpuMove);
 	RegisterType(CpuTransform);
 

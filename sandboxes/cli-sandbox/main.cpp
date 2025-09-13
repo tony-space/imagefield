@@ -1,4 +1,5 @@
 #include <imf/core/core.hpp>
+#include <imf/core/node/node.hpp>
 
 int main()
 {
@@ -7,15 +8,22 @@ int main()
 		using namespace imf::core;
 
 		auto cpuRuntime = make_runtime("cpu");
+
+		auto scalePlaceholder1 = PlaceholderNode::make_variable(8.0f);
+		auto scalePlaceholder2 = PlaceholderNode::make_variable(4.0f);
+		auto functorNode = FunctorNode::make([](float factor1, float factor2)
+		{
+			return glm::vec2(factor1, factor2);
+		}, scalePlaceholder1->outputs().front(), scalePlaceholder2->outputs().front());
 	
 		auto toLinear = make_graph_node("ColorSpaceConvert");
-		toLinear->setInput("image", TypeQualifier::Variable, cpuRuntime->loadImage("../assets/png/noise128.png"));
+		toLinear->setInput("image", TypeQualifier::Variable, cpuRuntime->loadImage("../assets/png/lenna.png"));
 		toLinear->setInput("sourceColorSpace", TypeQualifier::Constant, color::ColorSpace::sRGB);
 		toLinear->setInput("targetColorSpace", TypeQualifier::Constant, color::ColorSpace::Linear_sRGB);
 
 		auto bicubic = make_graph_node("BicubicUpscale");
 		bicubic->setInput("image", toLinear->outputs().front());
-		bicubic->setInput("scale", TypeQualifier::Constant, glm::vec2(8.0f, 8.0f));
+		bicubic->setInput("scale", functorNode->outputs().front());
 
 		auto toGamma = make_graph_node("ColorSpaceConvert");
 		toGamma->setInput("image", bicubic->outputs().front());

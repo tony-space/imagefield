@@ -3,6 +3,7 @@
 #include <imf/core/BoundingBox.hpp>
 #include <imf/core/ColorSpace.hpp>
 #include <imf/core/DataFlow.hpp>
+#include <imf/core/function_traits.hpp>
 #include <imf/core/GraphExecutor.hpp>
 #include <imf/core/GraphNode.hpp>
 #include <imf/core/GraphNodeFactory.hpp>
