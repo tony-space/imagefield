@@ -102,7 +102,6 @@ private:
 	void scanAllFlowsPhase(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks);
 
 	void mainProcessingStage(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks);
-	void recurseProcessing(std::set<core::unique_id_t>& visited, const core::GraphNode& curNode);
 
 	void processPlaceholderNode(const core::PlaceholderNode& placeholderNode);
 	void processSinkNode(const core::SinkNode& placeholderNode);

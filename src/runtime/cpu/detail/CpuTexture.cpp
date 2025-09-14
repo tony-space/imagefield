@@ -124,10 +124,10 @@ CpuTexture::MipLevel CpuTexture::downsample(core::ThreadPool& pool, const MipLev
 
 			for (unsigned x = 0; x < resultDim.x; ++x)
 			{
-				auto rightmost = x * 2;
-				if (rightmost < inLevel.dim.x)
+				auto rightmost = x * 2 + 1;
+				if (rightmost == inLevel.dim.x)
 				{
-					rightmost++;
+					rightmost = x * 2;
 				}
 
 				// Regular box filter works fine for downsampling unless alpha is involved.

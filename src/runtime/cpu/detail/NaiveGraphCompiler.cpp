@@ -7,6 +7,8 @@
 #include <imf/core/node/SinkNode.hpp>
 #include <imf/core/log.hpp>
 
+#include <boost/container/small_vector.hpp>
+
 namespace imf::runtime::cpu
 {
 
@@ -211,28 +213,21 @@ void NaiveGraphCompiler::mainProcessingStage(const core::iterator_range<const st
 
 	for (const auto& sink : sinks)
 	{
-		recurseProcessing(visited, *sink);
-	}
-}
-
-void NaiveGraphCompiler::recurseProcessing(std::set<core::unique_id_t>& visited, const core::GraphNode& curNode)
-{
-	for (const auto& input : curNode.inputs())
-	{
-		recurseProcessing(visited, input->producer());
-	}
-
-	if (auto placeholderNode = curNode.as<core::PlaceholderNode>())
-	{
-		processPlaceholderNode(*placeholderNode);
-	}
-	else if (auto sinkNode = curNode.as<core::SinkNode>())
-	{
-		processSinkNode(*sinkNode);
-	}
-	else
-	{
-		processRegularNode(curNode);
+		detail::recurseTraversalPost(visited, *sink, [this](const core::GraphNode& curNode)
+		{
+			if (auto placeholderNode = curNode.as<core::PlaceholderNode>())
+			{
+				processPlaceholderNode(*placeholderNode);
+			}
+			else if (auto sinkNode = curNode.as<core::SinkNode>())
+			{
+				processSinkNode(*sinkNode);
+			}
+			else
+			{
+				processRegularNode(curNode);
+			}
+		});
 	}
 }
 
@@ -279,8 +274,9 @@ void NaiveGraphCompiler::processSinkNode(const core::SinkNode& sinkNode)
 
 void NaiveGraphCompiler::processRegularNode(const core::GraphNode& curNode)
 {
-	std::vector<core::source_operand> sources;
-	std::vector<core::destination_operand> destinations;
+	static constexpr std::size_t kPreallocatedSize = 8;
+	boost::container::small_vector<core::source_operand, kPreallocatedSize> sources;
+	boost::container::small_vector<core::destination_operand, kPreallocatedSize> destinations;
 
 	for (const auto& input : curNode.inputs())
 	{
@@ -344,6 +340,7 @@ void NaiveGraphCompiler::processRegularNode(const core::GraphNode& curNode)
 core::source_operand NaiveGraphCompiler::convertFlowToOperand(const std::shared_ptr<const core::DataFlow>& input)
 {
 	auto& flowInfo = m_flows.at(input.get());
+	assert(flowInfo.usages > 0);
 	flowInfo.usages--;
 
 	if (flowInfo.constant())

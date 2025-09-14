@@ -113,6 +113,37 @@ struct type_list_to_vector<type_list_t<Types...>>
 	}
 };
 
+template <typename...>
+struct store_result;
+
+template <typename T>
+struct store_result<T>
+{
+	static void invoke(EvaluationContext& ctx, destination_operand_iterator_t it, T&& result)
+	{
+		ctx.set(it->location, std::forward<T>(result));
+	}
+};
+
+template <typename Head, typename... Tail>
+struct store_result<Head, Tail...>
+{
+	static void invoke(EvaluationContext& ctx, destination_operand_iterator_t it, Head&& head, Tail&& ...tail)
+	{
+		store_result<Head>::invoke(ctx, it, std::forward<Head>(head));
+		store_result<Tail...>::invoke(ctx, std::next(it), std::forward<Tail...>(tail)...);
+	}
+};
+
+template <typename ...T>
+struct store_result<std::tuple<T...>>
+{
+	static void invoke(EvaluationContext& ctx, destination_operand_iterator_t it, std::tuple<T...>&& result)
+	{
+		store_result<T...>::invoke(ctx, it, std::move(std::get<T>(result))...);
+	}
+};
+
 template <typename Func>
 FunctorNode::functor_t make_functor(Func&& func)
 {
@@ -124,7 +155,7 @@ FunctorNode::functor_t make_functor(Func&& func)
 	FunctorNode::functor_t functor = [func = std::forward<Func>(func)](EvaluationContext& ctx, destination_operands_range dstRange, source_operands_range srcRange)
 	{
 		return_type result = apply_operands<arguments_list_t>::invoke(func, ctx, srcRange.begin());
-		ctx.set(dstRange.front().location, std::move(result));
+		store_result<return_type>::invoke(ctx, dstRange.begin(), std::move(result));
 	};
 
 	return functor;
@@ -139,13 +170,33 @@ FunctorNode::small_vector_t<TypeID> make_input_types()
 	return type_list_to_vector<arguments_list_t>::invoke();
 }
 
+template <typename T>
+struct return_type_to_vector
+{
+	static FunctorNode::small_vector_t<TypeID> invoke()
+	{
+		return { TypeID::make<T>() };
+	}
+};
+
+template <typename ...T>
+struct return_type_to_vector<std::tuple<T...>>
+{
+	static FunctorNode::small_vector_t<TypeID> invoke()
+	{
+		FunctorNode::small_vector_t<TypeID> result;
+		(result.emplace_back(TypeID::make<T>()), ...);
+		return result;
+	}
+};
+
 template <typename Func>
 FunctorNode::small_vector_t<TypeID> make_output_types()
 {
 	using signature_t = function_traits<std::decay_t<Func>>;
 	using return_type = typename signature_t::return_type;
 
-	return { TypeID::make<return_type>() };
+	return return_type_to_vector<return_type>::invoke();
 }
 
 template <typename... Args>
