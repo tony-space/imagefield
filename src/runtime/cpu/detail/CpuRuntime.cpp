@@ -1,9 +1,10 @@
-#include "CpuSampler.hpp"
 #include "NaiveGraphCompiler.hpp"
-#include "Rasterizer.hpp"
 
+#include <imf/runtime/cpu/CpuOperationFactory.hpp>
 #include <imf/runtime/cpu/CpuRuntime.hpp>
+#include <imf/runtime/cpu/CpuSampler.hpp>
 #include <imf/runtime/cpu/CpuTexture.hpp>
+#include <imf/runtime/cpu/Rasterizer.hpp>
 
 #include <imf/core/Image.hpp>
 #include <imf/core/ITexture.hpp>

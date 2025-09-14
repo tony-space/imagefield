@@ -3,19 +3,19 @@ cmake_minimum_required(VERSION 3.22.1)
 project(IMFRuntimeCpu LANGUAGES CXX)
 
 set(SRC
+	include/imf/runtime/cpu/CpuOperationFactory.hpp
 	include/imf/runtime/cpu/CpuRuntime.hpp
+	include/imf/runtime/cpu/CpuSampler.hpp
 	include/imf/runtime/cpu/CpuTexture.hpp
 	include/imf/runtime/cpu/pch.hpp
+	include/imf/runtime/cpu/Rasterizer.hpp
 
 	detail/CpuOperationFactory.cpp
-	detail/CpuOperationFactory.hpp
 	detail/CpuRuntime.cpp
 	detail/CpuSampler.cpp
-	detail/CpuSampler.hpp
 	detail/CpuTexture.cpp
 	detail/NaiveGraphCompiler.cpp
 	detail/NaiveGraphCompiler.hpp
-	detail/Rasterizer.hpp
 
 	detail/operations/CpuBicubicUpscale.cpp
 	detail/operations/CpuColorSpaceConvert.cpp

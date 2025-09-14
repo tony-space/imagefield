@@ -1,4 +1,4 @@
-#include "CpuSampler.hpp"
+#include <imf/runtime/cpu/CpuSampler.hpp>
 #include <imf/runtime/cpu/CpuRuntime.hpp>
 #include <imf/runtime/cpu/CpuTexture.hpp>
 

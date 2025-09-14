@@ -1,6 +1,6 @@
 #include "NaiveGraphCompiler.hpp"
-#include "CpuOperationFactory.hpp"
 
+#include <imf/runtime/cpu/CpuOperationFactory.hpp>
 #include <imf/runtime/cpu/CpuRuntime.hpp>
 
 #include <imf/core/node/PlaceholderNode.hpp>
