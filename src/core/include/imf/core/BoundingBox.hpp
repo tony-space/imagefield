@@ -130,7 +130,7 @@ public:
 		return true;
 	}
 	
-	template<typename T>
+	template<typename T = glm::uvec2>
 	[[nodiscard]] constexpr T textureSize() const
 	{
 		assert(finite());
@@ -150,6 +150,15 @@ public:
 			transform(m, vec2<1>()),
 			transform(m, vec2<2>()),
 			transform(m, vec2<3>()),
+		};
+	}
+
+	[[nodiscard]] constexpr BoundingBox expand(const glm::vec2& delta) const noexcept
+	{
+		return
+		{
+			m_min - delta,
+			m_max + delta
 		};
 	}
 	

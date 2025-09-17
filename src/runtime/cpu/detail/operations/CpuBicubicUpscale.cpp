@@ -55,7 +55,7 @@ public:
 		const auto stepSize = dir / textureSize;
 
 		auto targetBox = transformed.boundingBox();
-		auto targetTexture = std::make_shared<CpuTexture>(targetBox.textureSize<glm::uvec2>(), m_runtime.workingFormat());
+		auto targetTexture = std::make_shared<CpuTexture>(targetBox.textureSize(), m_runtime.workingFormat());
 
 		Rasterizer::rasterize(m_runtime.threadPool(), *targetTexture, targetBox, transformed.localRegion()->triangles(), transformed.uvToWorldMat(),
 		[&](glm::mat4x2 pixelPosQuad)

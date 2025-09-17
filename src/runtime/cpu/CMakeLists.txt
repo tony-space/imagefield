@@ -20,6 +20,7 @@ set(SRC
 	detail/operations/CpuBicubicUpscale.cpp
 	detail/operations/CpuColorSpaceConvert.cpp
 	detail/operations/CpuFunctor.cpp
+	detail/operations/CpuGaussianBlur1D.cpp
 	detail/operations/CpuMove.cpp
 	detail/operations/CpuTransform.cpp
 )

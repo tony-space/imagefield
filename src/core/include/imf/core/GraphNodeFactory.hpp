@@ -30,4 +30,10 @@ std::string_view operation_name_##TYPE() noexcept\
 
 [[nodiscard]] std::shared_ptr<GraphNode> make_graph_node(std::string_view name);
 
+template<typename T>
+[[nodiscard]] std::shared_ptr<GraphNode> make_graph_node()
+{
+	return std::make_shared<T>();
+}
+
 }

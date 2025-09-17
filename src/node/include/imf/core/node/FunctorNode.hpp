@@ -125,22 +125,26 @@ struct store_result<T>
 	}
 };
 
-template <typename Head, typename... Tail>
-struct store_result<Head, Tail...>
-{
-	static void invoke(EvaluationContext& ctx, destination_operand_iterator_t it, Head&& head, Tail&& ...tail)
-	{
-		store_result<Head>::invoke(ctx, it, std::forward<Head>(head));
-		store_result<Tail...>::invoke(ctx, std::next(it), std::forward<Tail...>(tail)...);
-	}
-};
-
 template <typename ...T>
 struct store_result<std::tuple<T...>>
 {
+	constexpr static size_t kSize = sizeof...(T);
+
+	template<typename U>
+	static void invoke(EvaluationContext& ctx, destination_operand_iterator_t it, U&& result)
+	{
+		store_result<U>::invoke(ctx, it, std::forward<U>(result));
+	}
+
+	template <size_t Idx = 0>
 	static void invoke(EvaluationContext& ctx, destination_operand_iterator_t it, std::tuple<T...>&& result)
 	{
-		store_result<T...>::invoke(ctx, it, std::move(std::get<T>(result))...);
+		invoke(ctx, it, std::move(std::get<Idx>(result)));
+
+		if constexpr (Idx + 1 < kSize)
+		{
+			invoke<Idx + 1>(ctx, std::next(it), std::move(result));
+		}
 	}
 };
 

@@ -13,6 +13,7 @@ static std::map<std::string_view, imf::core::graph_node_instantiator_t> register
 
 	RegisterType(BicubicUpscaleNode);
 	RegisterType(ColorSpaceConvertNode);
+	RegisterType(GaussianBlurNode);
 	RegisterType(TransformNode);
 
 	return map;

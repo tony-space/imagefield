@@ -18,6 +18,8 @@ public:
 	glm::mat4x2 textureCoords(const glm::mat4x2& worldQuad) const noexcept;
 	glm::mat4 sample(const glm::mat4x2& worldQuad) const noexcept;
 	glm::mat4 sampleByTextureCoords(const glm::mat4x2& normalizedTcQuad) const noexcept;
+	glm::mat4 sampleForConvolution(const glm::mat4x2& worldQuad) const noexcept;
+	glm::mat4 sampleForConvolutionByTextureCoords(const glm::mat4x2& normalizedTcQuad) const noexcept;
 private:
 	using wrapFunc = unsigned (*)(long coord, unsigned size) noexcept;
 	using MagSamplingFunc = glm::vec4(*) (const CpuSampler*, const glm::vec2& tc) noexcept;

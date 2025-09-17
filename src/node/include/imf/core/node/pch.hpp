@@ -2,6 +2,7 @@
 
 #include <imf/core/core.hpp>
 
+#include <imf/core/node/ChildGraphBase.hpp>
 #include <imf/core/node/FunctorNode.hpp>
 #include <imf/core/node/GraphNodeBase.hpp>
 

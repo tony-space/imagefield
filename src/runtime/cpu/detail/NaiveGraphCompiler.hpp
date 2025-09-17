@@ -12,6 +12,7 @@ namespace imf::core
 {
 class PlaceholderNode;
 class SinkNode;
+class ReferenceNode;
 }
 
 namespace imf::runtime::cpu
@@ -97,17 +98,18 @@ private:
 		}
 	};
 
-
 	void validateTopologyStage(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks);
 	void scanAllFlowsPhase(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks);
 
 	void mainProcessingStage(const core::iterator_range<const std::shared_ptr<const core::SinkNode>*>& sinks);
 
 	void processPlaceholderNode(const core::PlaceholderNode& placeholderNode);
-	void processSinkNode(const core::SinkNode& placeholderNode);
+	void processSinkNode(const core::SinkNode& sinkNode);
 	void processRegularNode(const core::GraphNode& graphNode);
+	void processReferenceNode(const core::ReferenceNode& referenceNode);
+	FlowInfo& resolveReference(const core::ReferenceNode& referenceNode);
 
-	core::source_operand convertFlowToOperand(const std::shared_ptr<const core::DataFlow>& input);
+	core::source_operand convertFlowToOperand(const core::DataFlow* flow);
 
 	CpuRuntime& m_runtime;
 	EvaluationContextAllocator m_evalCtxAllocator;

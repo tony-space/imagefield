@@ -2,6 +2,9 @@
 #include <imf/core/node/GraphNodeBase.hpp>
 #include <imf/core/node/PlaceholderNode.hpp>
 
+#include <imf/core/Image.hpp>
+#include <imf/core/glm.hpp>
+
 namespace imf::core
 {
 

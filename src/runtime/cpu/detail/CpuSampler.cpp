@@ -48,6 +48,24 @@ glm::mat4x2 CpuSampler::textureCoords(const glm::mat4x2& worldQuad) const noexce
 	return core::projectToPlane(m_worldToUvMat, worldQuad);
 }
 
+glm::mat4 CpuSampler::sampleForConvolution(const glm::mat4x2& worldQuad) const noexcept
+{
+	return sampleForConvolutionByTextureCoords(textureCoords(worldQuad));
+}
+
+glm::mat4 CpuSampler::sampleForConvolutionByTextureCoords(const glm::mat4x2& normalizedTcQuad) const noexcept
+{
+	auto color = sampleByTextureCoords(normalizedTcQuad);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		const auto inBounds = !(normalizedTcQuad[i].x < 0.0f || normalizedTcQuad[i].y < 0.0f || normalizedTcQuad[i].x > 1.0f || normalizedTcQuad[i].y > 1.0f);
+		color[i] = glm::vec4(color[i].rgb(), inBounds ? color[i].a : 0.0f);
+	}
+
+	return color;
+}
+
 glm::mat4 CpuSampler::sample(const glm::mat4x2& worldQuad) const noexcept
 {
 	return sampleByTextureCoords(textureCoords(worldQuad));

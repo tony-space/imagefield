@@ -3,8 +3,9 @@
 #include <imf/core/ITexture.hpp>
 #include <imf/core/pixel_transform.hpp>
 
+#include <boost/container/small_vector.hpp>
+
 #include <memory>
-#include <vector>
 
 namespace imf::core
 {
@@ -49,7 +50,7 @@ public:
 	void msaaResolve(core::ThreadPool& pool);
 private:
 	MipLevel m_msaa4x;
-	std::vector<MipLevel> m_mipMaps;
+	boost::container::small_vector<MipLevel, 16> m_mipMaps;
 	core::TextureFormat m_format;
 
 };

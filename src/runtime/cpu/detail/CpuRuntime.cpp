@@ -110,16 +110,18 @@ void CpuRuntime::saveImage(core::Image image, const std::filesystem::path& path)
 
 core::Image CpuRuntime::blit(const core::Image& image, const core::SamplerDesc& desc)
 {
+	const auto& targetBox = image.boundingBox();
+	const auto targetDim = targetBox.textureSize();
+
 	if (image.localRegion()->trivialRectangle() &&
-		image.uvToWorldMat() == core::Image::calcUvToWorldMat(image.boundingBox()) &&
+		image.uvToWorldMat() == core::Image::calcUvToWorldMat(targetBox) &&
+		image.texture()->dim().xy() == targetDim &&
 		desc == core::SamplerDesc{}
 		)
 	{
 		return image;
 	}
 
-	const auto& targetBox = image.boundingBox();
-	const auto targetDim = targetBox.textureSize<glm::uvec2>();
 	auto targetTexture = std::make_shared<CpuTexture>(targetDim, m_workingFormat);
 
 	const auto sampler = CpuSampler(*this, image, desc);
@@ -135,7 +137,10 @@ core::Image CpuRuntime::blit(const core::Image& image, const core::SamplerDesc& 
 	return core::Image
 	(
 		std::move(targetTexture),
-		targetBox
+		targetBox,
+		nullptr,
+		image.componentMapping(),
+		image.lodSettings()
 	);
 }
 

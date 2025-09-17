@@ -1,9 +1,7 @@
 #pragma once
 
 #include <imf/core/TypeID.hpp>
-#include <imf/core/Image.hpp>
 #include <imf/core/GraphNode.hpp>
-#include <imf/core/glm.hpp>
 #include <imf/core/DataFlow.hpp>
 
 #include <array>
@@ -34,11 +32,13 @@ template <typename Derived, std::size_t kInputs, std::size_t kOutputs = 1>
 class GraphNodeBase : public GraphNode
 {
 public:
+	// prevents base class function hiding
+	using GraphNode::setInput;
+
 	constexpr GraphNodeBase() : m_outputs(detail::make_outputs<Derived>(this))
 	{
 
 	}
-
 	std::string_view operationName() const noexcept override final
 	{
 		return Derived::operation_name;
@@ -55,7 +55,6 @@ public:
 	{
 		return { m_inputs.data(), m_inputs.data() + m_inputs.size() };
 	}
-
 	iterator_range<const std::string_view*> outputNames() const noexcept override final
 	{
 		return { std::begin(Derived::output_names), std::end(Derived::output_names) };
@@ -68,8 +67,7 @@ public:
 	{
 		return { m_outputs.data(), m_outputs.data() + m_outputs.size() };
 	}
-
-	void setInput(const std::string_view& name, const DataFlow& flow) override final
+	void setInput(const std::string_view& name, const DataFlow& flow) override
 	{
 		auto it = std::find(std::begin(Derived::input_names), std::end(Derived::input_names), name);
 		if (it == std::end(Derived::input_names))

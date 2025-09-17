@@ -5,6 +5,9 @@
 
 #include <imf/core/node/PlaceholderNode.hpp>
 #include <imf/core/node/SinkNode.hpp>
+#include <imf/core/node/ReferenceNode.hpp>
+#include <imf/core/node/ChildGraphBase.hpp>
+
 #include <imf/core/log.hpp>
 
 #include <boost/container/small_vector.hpp>
@@ -14,6 +17,38 @@ namespace imf::runtime::cpu
 
 namespace detail
 {
+
+template<typename Func>
+static void for_each_input(const core::GraphNode& curNode, const Func& func)
+{
+	for (const auto& input : curNode.inputs())
+	{
+		if (input == nullptr)
+		{
+			const auto idx = std::distance(curNode.inputs().begin(), &input);
+			throw std::invalid_argument
+			(
+				std::string(curNode.operationName())
+				+ ':'
+				+ std::string(curNode.inputNames()[idx])
+				+ " is nullptr"
+			);
+		}
+
+		const auto producer = &input->producer();
+
+		if (const auto* childGraph = dynamic_cast<const core::IChildGraph*>(producer))
+		{
+			auto idx = std::distance(producer->outputs().begin(), input.get());
+			const auto& referenceOutput = childGraph->outputReferences()[idx]->outputs().front();
+			func(referenceOutput);
+		}
+		else
+		{
+			func(*input);
+		}
+	}
+}
 
 template<typename Visited, typename Func>
 static void recurseTraversalPre(Visited& visited, const core::GraphNode& curNode, const Func& func)
@@ -27,11 +62,11 @@ static void recurseTraversalPre(Visited& visited, const core::GraphNode& curNode
 
 	func(curNode);
 
-	for (const auto& input : curNode.inputs())
+	for_each_input(curNode, [&](const core::DataFlow& input)
 	{
-		const auto& producer = input->producer();
+		const auto& producer = input.producer();
 		recurseTraversalPre(visited, producer, func);
-	}
+	});
 }
 
 template<typename Visited, typename Func>
@@ -44,11 +79,11 @@ static void recurseTraversalPost(Visited& visited, const core::GraphNode& curNod
 		return;
 	}
 
-	for (const auto& input : curNode.inputs())
+	for_each_input(curNode, [&](const core::DataFlow& input)
 	{
-		const auto& producer = input->producer();
+		const auto& producer = input.producer();
 		recurseTraversalPost(visited, producer, func);
-	}
+	});
 
 	func(curNode);
 }
@@ -65,11 +100,11 @@ static void recurseTraversalBoth(Visited& visited, const core::GraphNode& curNod
 
 	preFunc(curNode);
 
-	for (const auto& input : curNode.inputs())
+	for_each_input(curNode, [&](const core::DataFlow& input)
 	{
-		const auto& producer = input->producer();
+		const auto& producer = input.producer();
 		recurseTraversalBoth(visited, producer, preFunc, postFunc);
-	}
+	});
 
 	postFunc(curNode);
 }
@@ -108,22 +143,10 @@ void NaiveGraphCompiler::validateTopologyStage(const core::iterator_range<const 
 		detail::recurseTraversalBoth(visited, *sink, [&](const core::GraphNode& curNode)
 		{
 			breadcrumbs.insert(curNode.instanceId());
-
-			for (std::size_t i = 0, len = curNode.inputs().size(); i < len; ++i)
+			
+			detail::for_each_input(curNode, [&](const core::DataFlow& inputFlow)
 			{
-				const auto& inputFlow = curNode.inputs()[i];
-				if (inputFlow == nullptr)
-				{
-					throw std::invalid_argument
-					(
-						std::string(curNode.operationName())
-						+ ':'
-						+ std::string(curNode.inputNames()[i])
-						+ " is nullptr"
-					);
-				}
-
-				if (breadcrumbs.count(inputFlow->producer().instanceId()))
+				if (breadcrumbs.count(inputFlow.producer().instanceId()))
 				{
 					throw std::invalid_argument
 					(
@@ -131,7 +154,7 @@ void NaiveGraphCompiler::validateTopologyStage(const core::iterator_range<const 
 						+ " loops itself"
 					);
 				}
-			}
+			});
 		}, [&](const core::GraphNode& curNode)
 		{
 			breadcrumbs.erase(curNode.instanceId());
@@ -176,13 +199,14 @@ void NaiveGraphCompiler::scanAllFlowsPhase(const core::iterator_range<const std:
 			else
 			{
 				auto constantOutput = true;
-				for (auto input : curNode.inputs())
+
+				detail::for_each_input(curNode, [&](const core::DataFlow& input)
 				{
-					auto& flowInfo = m_flows.at(input.get());
+					auto& flowInfo = m_flows.at(&input);
 
 					flowInfo.usages++;
 					constantOutput = constantOutput && flowInfo.constant();
-				}
+				});
 
 				if (!curNode.as<core::SinkNode>())
 				{
@@ -222,6 +246,10 @@ void NaiveGraphCompiler::mainProcessingStage(const core::iterator_range<const st
 			else if (auto sinkNode = curNode.as<core::SinkNode>())
 			{
 				processSinkNode(*sinkNode);
+			}
+			else if (auto referenceNode = curNode.as<core::ReferenceNode>())
+			{
+				processReferenceNode(*referenceNode);
 			}
 			else
 			{
@@ -278,10 +306,10 @@ void NaiveGraphCompiler::processRegularNode(const core::GraphNode& curNode)
 	boost::container::small_vector<core::source_operand, kPreallocatedSize> sources;
 	boost::container::small_vector<core::destination_operand, kPreallocatedSize> destinations;
 
-	for (const auto& input : curNode.inputs())
+	detail::for_each_input(curNode, [&](const core::DataFlow& input)
 	{
-		sources.emplace_back(convertFlowToOperand(input));
-	}
+		sources.emplace_back(convertFlowToOperand(&input));
+	});
 
 	const auto constantInputs = std::all_of(sources.begin(), sources.end(), [](const core::source_operand& operand)
 	{
@@ -337,21 +365,61 @@ void NaiveGraphCompiler::processRegularNode(const core::GraphNode& curNode)
 	}
 }
 
-core::source_operand NaiveGraphCompiler::convertFlowToOperand(const std::shared_ptr<const core::DataFlow>& input)
+void NaiveGraphCompiler::processReferenceNode(const core::ReferenceNode& referenceNode)
 {
-	auto& flowInfo = m_flows.at(input.get());
-	assert(flowInfo.usages > 0);
-	flowInfo.usages--;
+	const auto* curReferenceNode = &referenceNode;
+
+	while (curReferenceNode)
+	{
+		const core::DataFlow* referenceInput = curReferenceNode->inputs().front().get();
+
+		auto flowIt = m_flows.find(referenceInput);
+		assert(flowIt->second.usages > 0);
+		flowIt->second.usages--;
+
+		curReferenceNode = referenceInput->producer().as<core::ReferenceNode>();
+	}
+}
+
+NaiveGraphCompiler::FlowInfo& NaiveGraphCompiler::resolveReference(const core::ReferenceNode& referenceNode)
+{
+	const auto* curReferenceNode = &referenceNode;
+	auto flowIt = m_flows.end();
+
+	while (curReferenceNode)
+	{
+		const core::DataFlow* referenceInput = curReferenceNode->inputs().front().get();
+		flowIt = m_flows.find(referenceInput);
+		assert(flowIt->second.usages == 0);
+		curReferenceNode = referenceInput->producer().as<core::ReferenceNode>();
+	}
+
+	return flowIt->second;
+}
+
+core::source_operand NaiveGraphCompiler::convertFlowToOperand(const core::DataFlow* flow)
+{
+	auto& flowInfo = [&]() -> FlowInfo&
+	{
+		if (const auto* referenceNode = flow->producer().as<core::ReferenceNode>())
+		{
+			return resolveReference(*referenceNode);
+		}
+		else
+		{
+			return m_flows.at(flow);
+		}
+	}();
 
 	if (flowInfo.constant())
 	{
 		if (flowInfo.usages == 0)
 		{
-			return core::source_operand{ std::move(flowInfo.value()), input->dataType() };
+			return core::source_operand{ std::move(flowInfo.value()), flow->dataType() };
 		}
 		else
 		{
-			return core::source_operand{ flowInfo.value(), input->dataType() };
+			return core::source_operand{ flowInfo.value(), flow->dataType() };
 		}
 	}
 	else
@@ -360,7 +428,7 @@ core::source_operand NaiveGraphCompiler::convertFlowToOperand(const std::shared_
 		{
 			m_evalCtxAllocator.free(flowInfo.location());
 		}
-		return core::source_operand{ flowInfo.location(), input->dataType() };
+		return core::source_operand{ flowInfo.location(), flow->dataType() };
 	}
 
 }
