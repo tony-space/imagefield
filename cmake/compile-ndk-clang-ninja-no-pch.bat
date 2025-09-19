@@ -10,13 +10,12 @@ SET BUILD_PATH=build-android/%PLATFORM_ABI%/%BUILD_TYPE%
 cmake ^
 	-S . ^
 	-B %BUILD_PATH% ^
-	-G "Unix Makefiles" ^
+	-G Ninja ^
 	-DCMAKE_BUILD_TYPE=%BUILD_TYPE% ^
 	-DCMAKE_CXX_FLAGS="" ^
 	-DCMAKE_TOOLCHAIN_FILE=%NDK_LOCATION%/build/cmake/android.toolchain.cmake ^
 	-DANDROID_PLATFORM=%PLATFORM_VERSION% ^
 	-DANDROID_ABI=%PLATFORM_ABI% ^
-	-DCMAKE_MAKE_PROGRAM=%NDK_LOCATION%/prebuilt/windows-x86_64/bin/make.exe ^
-	-DIMF_UNITY_BUILD=ON
+	-DIMF_USE_PRECOMPILED_HEADERS=OFF
 
-cmake --build %BUILD_PATH% --parallel %NUMBER_OF_PROCESSORS% --config %BUILD_TYPE%
+ninja -C %BUILD_PATH%
