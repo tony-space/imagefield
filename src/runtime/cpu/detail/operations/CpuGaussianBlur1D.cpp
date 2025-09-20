@@ -92,9 +92,28 @@ public:
 			for (auto i = -int(kernelRadius); i <= int(kernelRadius); i++)
 			{
 				const auto offset = glm::vec2(i * step);
-				const auto color = sampler.sampleForConvolution(pixelPosQuad + glm::mat4x2(offset, offset, offset, offset));
-				sum += color * (*it);
+				auto color = sampler.sampleForConvolution(pixelPosQuad + glm::mat4x2(offset, offset, offset, offset));
+				const auto weight = *it;
 				++it;
+
+				for (int comp = 0; comp != 4; ++comp)
+				{
+					color[comp].r *= color[comp].a;
+					color[comp].g *= color[comp].a;
+					color[comp].b *= color[comp].a;
+				}
+
+				sum += color * weight;
+			}
+
+			for (int comp = 0; comp != 4; ++comp)
+			{
+				if (sum[comp].a > 0.0f)
+				{
+					sum[comp].r /= sum[comp].a;
+					sum[comp].g /= sum[comp].a;
+					sum[comp].b /= sum[comp].a;
+				}
 			}
 
 			return sum;

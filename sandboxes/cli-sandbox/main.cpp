@@ -10,7 +10,7 @@ int main()
 		auto cpuRuntime = make_runtime("cpu");
 
 		auto toLinear = make_graph_node("ColorSpaceConvert");
-		toLinear->setInput("image", TypeQualifier::Variable, cpuRuntime->loadImage("../assets/png/lenna.png"));
+		toLinear->setInput("image", TypeQualifier::Variable, cpuRuntime->loadImage("../assets/png/dice.png"));
 		toLinear->setInput("sourceColorSpace", TypeQualifier::Constant, color::ColorSpace::sRGB);
 		toLinear->setInput("targetColorSpace", TypeQualifier::Constant, color::ColorSpace::Linear_sRGB);
 

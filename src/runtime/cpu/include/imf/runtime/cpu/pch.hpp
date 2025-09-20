@@ -9,6 +9,8 @@
 
 #include <stb/stb_image.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <fstream>
 #include <queue>
 #include <set>
