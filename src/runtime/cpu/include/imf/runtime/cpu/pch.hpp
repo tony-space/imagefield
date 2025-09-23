@@ -12,6 +12,7 @@
 #include <boost/container/small_vector.hpp>
 
 #include <fstream>
+#include <numeric>
 #include <queue>
 #include <set>
 #include <stdexcept>

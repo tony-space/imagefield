@@ -4,6 +4,8 @@
 
 #include <boost/container/small_vector.hpp>
 
+#include <numeric>
+
 namespace imf::runtime::cpu
 {
 
@@ -77,7 +79,7 @@ public:
 
 		const auto targetBox = bakedImage.boundingBox().expand(horizontal ? glm::vec2(kernelRadius, 0u) : glm::vec2(0u, kernelRadius));
 		auto targetTexture = std::make_shared<CpuTexture>(targetBox.textureSize(), m_runtime.workingFormat());
-		auto targetRegion = std::make_shared<core::Region>(core::BoundingBox(1.0f, 1.0f));
+		auto targetRegion = core::Region::make(core::BoundingBox(1.0f, 1.0f));
 		auto targetMat = core::Image::calcUvToWorldMat(targetBox);
 
 		const auto step = horizontal ? glm::ivec2(1, 0) : glm::ivec2(0, 1);

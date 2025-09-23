@@ -1,44 +1,17 @@
 #pragma once
 
-#if _MSC_VER
-	#pragma warning(push)
-	#pragma warning(disable : 4127)
-	#pragma warning(disable : 4244)
-	#pragma warning(disable : 4100)
-#elif __clang__
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wunused-parameter"
-	#pragma clang diagnostic ignored "-Wunused-lambda-capture"
-#endif
-
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/geometries/register/point.hpp>
-
-#if _MSC_VER
-	#pragma warning(pop)
-#elif __clang__
-	#pragma clang diagnostic pop
-#endif
-
-#include <imf/core/BoundingBox.hpp>
-
+#include <memory>
 #include <optional>
 #include <vector>
-
-BOOST_GEOMETRY_REGISTER_POINT_2D(glm::vec2, glm::vec2::value_type, boost::geometry::cs::cartesian, x, y)
 
 namespace imf::core
 {
 
+class BoundingBox;
+
 class Region
 {
 public:
-	using polygon_t = boost::geometry::model::polygon<glm::vec2>;
-	using segment_t = boost::geometry::model::referring_segment<glm::vec2>;
-	using multi_polygon_t = boost::geometry::model::multi_polygon<polygon_t>;
-	using linestring_t = boost::geometry::model::linestring<glm::vec2>;
-
 	struct Triangulation
 	{
 		using index_triple = glm::uvec3;
@@ -48,54 +21,25 @@ public:
 		std::vector<index_triple> indices;
 	};
 
-	Region(const BoundingBox&);
-	Region(multi_polygon_t);
-	Region(const Region&) = default;
-	Region(Region&&) noexcept = default;
+	virtual ~Region() = default;
 
-	Region& operator=(const Region&) = default;
-	Region& operator=(Region&&) noexcept = default;
+	virtual const Triangulation& triangles() const = 0;
+	virtual const BoundingBox& boundingBox() const noexcept = 0;
 
-	const Triangulation& triangles() const;
-	const BoundingBox& boundingBox() const noexcept;
-	const multi_polygon_t& multiPolygon() const noexcept;
-
-	bool empty() const noexcept;
-	operator bool() const noexcept;
-	bool trivialRectangle() const noexcept;
-
-	template<typename Func>
-	void forEachPoint(const Func& func) const
-	{
-		boost::geometry::for_each_point(m_multiPolygon, func);
-	}
+	virtual bool empty() const noexcept = 0;
+	virtual operator bool() const noexcept = 0;
+	virtual bool trivialRectangle() const noexcept = 0;
 
 	template<typename Func>
 	bool anyOfPoints(const Func& func) const
 	{
-		for (const auto& polygon : m_multiPolygon)
+		const Func* funcOrObjPtr = &func;
+
+		return anyOfPointsImpl(+[](const void* ctx, const glm::vec2& v)
 		{
-			for (const auto& point : polygon.outer())
-			{
-				if (func(point))
-				{
-					return true;
-				}
-			}
-
-			for (const auto& ring : polygon.inners())
-			{
-				for (const auto& point : ring)
-				{
-					if (func(point))
-					{
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
+			const Func& func = *static_cast<const Func*>(ctx);
+			return func(v);
+		}, funcOrObjPtr);
 	}
 
 	template<typename Func>
@@ -107,63 +51,19 @@ public:
 		});
 	}
 
-	friend Region shape_difference(const Region& lhs, const Region& rhs);
-	friend Region shape_intersection(const Region& lhs, const Region& rhs);
-	friend Region shape_symmetric_difference(const Region& lhs, const Region& rhs);
-	friend Region shape_union(const Region& lhs, const Region& rhs);
+	//friend Region shape_difference(const Region& lhs, const Region& rhs);
+	//friend Region shape_intersection(const Region& lhs, const Region& rhs);
+	//friend Region shape_symmetric_difference(const Region& lhs, const Region& rhs);
+	//friend Region shape_union(const Region& lhs, const Region& rhs);
 
-	template <typename Iterator>
-	static Region make_convex(Iterator beginIt, Iterator endIt);
-	static Region make_convex(std::initializer_list<glm::vec2> l)
-	{
-		return make_convex(std::cbegin(l), std::cend(l));
-	}
-
-	template <typename Iterator>
-	static Region make_concave(Iterator beginIt, Iterator endIt);
-	static Region make_concave(std::initializer_list<glm::vec2> l)
-	{
-		return make_concave(std::cbegin(l), std::cend(l));
-	}
-
+	static std::shared_ptr<Region> make(const BoundingBox&);
 private:
-	multi_polygon_t m_multiPolygon;
-	mutable std::optional<BoundingBox> m_cachedBox;
-	mutable std::optional<Triangulation> m_cachedTriangulation;
+	virtual bool anyOfPointsImpl(bool(*pFn)(const void* ctx, const glm::vec2&), const void* ctx) const = 0;
 };
 
-template <typename Iterator>
-Region Region::make_convex(Iterator beginIt, Iterator endIt)
-{
-	auto lineString = linestring_t(beginIt, endIt);
-	auto hull = polygon_t();
-	boost::geometry::convex_hull(lineString, hull);
-
-	return multi_polygon_t{ std::move(hull) };
-}
-
-template <typename Iterator>
-Region Region::make_concave(Iterator beginIt, Iterator endIt)
-{
-	auto polygon = polygon_t();
-
-	polygon.outer().resize(std::distance(beginIt, endIt) + 1);
-
-	std::copy(beginIt, endIt, polygon.outer().begin());
-	polygon.outer().back() = *beginIt;
-
-	boost::geometry::correct(polygon);
-	if (!boost::geometry::is_valid(polygon))
-	{
-		throw std::invalid_argument("polygon self-intersects");
-	}
-
-	return multi_polygon_t{ std::move(polygon) };
-}
-
-Region shape_difference(const Region& lhs, const Region& rhs);
-Region shape_intersection(const Region& lhs, const Region& rhs);
-Region shape_symmetric_difference(const Region& lhs, const Region& rhs);
-Region shape_union(const Region& lhs, const Region& rhs);
+//Region shape_difference(const Region& lhs, const Region& rhs);
+//Region shape_intersection(const Region& lhs, const Region& rhs);
+//Region shape_symmetric_difference(const Region& lhs, const Region& rhs);
+//Region shape_union(const Region& lhs, const Region& rhs);
 
 }

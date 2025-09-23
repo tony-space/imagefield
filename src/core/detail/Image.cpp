@@ -41,7 +41,7 @@ Image::Image
 
 	if (!m_localRegion)
 	{
-		m_localRegion = std::make_shared<const Region>(BoundingBox(1.0f, 1.0f));
+		m_localRegion = Region::make(BoundingBox(1.0f, 1.0f));
 	}
 
 	if (!uvToWorldMat)
