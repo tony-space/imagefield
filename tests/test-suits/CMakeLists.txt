@@ -4,9 +4,12 @@ project(test-suits LANGUAGES CXX)
 
 set(SRC
 	detail/basic-test-suite.cpp
-	detail/cpu-rasterizer-suite.cpp 
+	detail/blur-suite.cpp
+	detail/cpu-rasterizer-suite.cpp
+	detail/system.cpp
 
 	include/imf/tests/pch.hpp
+	include/imf/tests/system.hpp
 )
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SRC})

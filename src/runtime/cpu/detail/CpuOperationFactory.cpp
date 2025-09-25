@@ -15,10 +15,15 @@ static std::map<std::string_view, imf::runtime::cpu::operation_instantiator_t> r
 	std::map<std::string_view, imf::runtime::cpu::operation_instantiator_t> map;
 
 	RegisterType(CpuBicubicUpscale);
+	RegisterType(CpuBoundingBox);
 	RegisterType(CpuColorSpaceConvert);
+	RegisterType(CpuCrop);
+	RegisterType(CpuDeltaImage);
 	RegisterType(CpuFunctor);
 	RegisterType(CpuGaussianBlur1D);
 	RegisterType(CpuMove);
+	RegisterType(CpuPeakSignalToNoiseRatio);
+	RegisterType(CpuTextureFormatConvert);
 	RegisterType(CpuTransform);
 
 	return map;

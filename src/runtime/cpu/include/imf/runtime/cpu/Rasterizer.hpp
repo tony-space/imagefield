@@ -49,7 +49,7 @@ public:
 	}
 
 	template<typename Callable>
-	static auto rasterize
+	static auto rasterizeMSAA
 	(
 		core::ThreadPool& pool,
 		CpuTexture& target,
@@ -232,6 +232,145 @@ public:
 				}
 			}
 		}, (msaaDim.y + 4 - 1) / 4); // i.e. (17|18|19|20 rows + 3) / 4 = 5 batches
+	}
+
+	template<typename Callable>
+	static auto rasterizeMSAA
+	(
+		core::ThreadPool& pool,
+		CpuTexture& target,
+		const core::BoundingBox& targetBox,
+		const core::Region::Triangulation& triangulation,
+		const glm::mat3& localToWorldMat,
+		const Callable& callback
+	) -> decltype(callback(std::declval<glm::mat4x2>()), void())
+	{
+		rasterizeMSAA(pool, target, targetBox, triangulation, localToWorldMat, [&](const glm::mat4x2& pixelQuad, int& /*unused coverage mask*/)
+		{
+			return callback(pixelQuad);
+		});
+	}
+
+	template<typename Callable>
+	static auto rasterize
+	(
+		core::ThreadPool& pool,
+		CpuTexture& target,
+		const core::BoundingBox& targetBox,
+		const core::Region::Triangulation& triangulation,
+		const glm::mat3& localToWorldMat,
+		const Callable& callback
+	) -> decltype(callback(std::declval<glm::mat4x2>(), std::declval<int&>()), void())
+	{
+		assert(target.dim().z == 1);
+		if (target.dim().z != 1)
+		{
+			throw std::invalid_argument("only 2D target is supported");
+		}
+
+		const auto& mip0 = target.at(0u);
+		const auto readTransformFunc = core::get_convert_func(target.format(), core::TextureFormat::RGBA32F);
+		const auto writeTransformFunc = core::get_convert_func(core::TextureFormat::RGBA32F, target.format());
+
+		// Imaging a one-pixel image rotated to 45 degrees.
+		// The axis-aligned bounding box of the rotated image is a square with a width of sqrt(2) == 1.4142.
+		// This means we need have our final framebuffer to be 2x2 pixels to properly represent the rotated image.
+		// Therefore the framebuffer space is 1.4 times larger than the original bounding box space.
+		// Scaling here is neccesary to squeeze framebuffer space into the bounding box space.
+		const auto framebufferToWorldMat
+			= core::translate(targetBox.min())
+			* core::scale(targetBox.size() / glm::vec2(mip0.dim.xy()));
+
+		pool.forEachSync([&](unsigned from, unsigned to)
+		{
+			// 2 rows per original image
+			auto rowBuffer = std::vector<glm::vec4>(mip0.dim.x * 2);
+
+			for (unsigned dualRowIdx = from; dualRowIdx < to; dualRowIdx++)
+			{
+				const auto rowIdx0 = dualRowIdx * 2;
+				const auto rowIdx1 = rowIdx0 + 1;
+
+				auto rowPtr0 = mip0.storage.get() + rowIdx0 * mip0.size.rowByteSize;
+				auto rowPtr1 = mip0.storage.get() + rowIdx1 * mip0.size.rowByteSize;
+
+				readTransformFunc(rowPtr0, rowBuffer.data(), mip0.dim.x);
+
+				if (rowIdx1 < mip0.dim.y)
+				{
+					readTransformFunc(rowPtr1, rowBuffer.data() + mip0.dim.x, mip0.dim.x);
+				}
+
+				for (const auto& triangle : triangulation.indices)
+				{
+					const auto v0 = core::projectToPlane(localToWorldMat, triangulation.vertices[triangle.x]);
+					const auto v1 = core::projectToPlane(localToWorldMat, triangulation.vertices[triangle.y]);
+					const auto v2 = core::projectToPlane(localToWorldMat, triangulation.vertices[triangle.z]);
+
+					for (unsigned colIdx = 0; colIdx < mip0.dim.x; colIdx += 2)
+					{
+						const auto framebufferSpaceQuad = glm::mat4x2
+						{
+							glm::vec2(colIdx + 0.5f, mip0.dim.y - (rowIdx1 + 0.5f)),
+							glm::vec2(colIdx + 1.5f, mip0.dim.y - (rowIdx1 + 0.5f)),
+							glm::vec2(colIdx + 0.5f, mip0.dim.y - (rowIdx0 + 0.5f)),
+							glm::vec2(colIdx + 1.5f, mip0.dim.y - (rowIdx0 + 0.5f))
+						};
+
+						const auto pixelPosQuad = glm::mat4x2
+						{
+							(framebufferToWorldMat * glm::vec3(framebufferSpaceQuad[0], 1.0f)).xy(),
+							(framebufferToWorldMat * glm::vec3(framebufferSpaceQuad[1], 1.0f)).xy(),
+							(framebufferToWorldMat * glm::vec3(framebufferSpaceQuad[2], 1.0f)).xy(),
+							(framebufferToWorldMat * glm::vec3(framebufferSpaceQuad[3], 1.0f)).xy(),
+						};
+
+						int coverageMask = 0;
+
+						for (int pixelIdx = 0; pixelIdx != 4; ++pixelIdx)
+						{
+							const auto& pixelPos = pixelPosQuad[pixelIdx];
+
+							const auto areas = barycentric(v0, v1, v2, pixelPos);
+							//const auto normalizedAreas = glm::vec3(areas) / areas.w;
+							const auto normalizedAreas = glm::vec3(areas) * glm::sign(areas.w);
+
+							const auto maskBit = static_cast<int>(glm::compMin(normalizedAreas) >= 0.0f);
+							coverageMask |= maskBit << pixelIdx;
+						}
+
+						// if entire quad is not covered
+						if (coverageMask == 0)
+						{
+							continue;
+						}
+
+						auto pixelQuadColor = callback(pixelPosQuad, coverageMask);
+
+						const auto hasRight = colIdx + 1 < mip0.dim.x;
+						const auto hasBottom = rowIdx1 < mip0.dim.y;
+
+						// pixel quad layout:
+						// 2 3
+						// 0 1
+						if (coverageMask & (1 << 0)) rowBuffer[colIdx] = pixelQuadColor[2];
+						if (hasRight && (coverageMask & (1 << 1))) rowBuffer[colIdx + 1] = pixelQuadColor[3];
+						if (hasBottom)
+						{
+							if (coverageMask & (1 << 2)) rowBuffer[mip0.dim.x + colIdx] = pixelQuadColor[0];
+							if (hasRight && (coverageMask & (1 << 3))) rowBuffer[mip0.dim.x + colIdx + 1] = pixelQuadColor[1];
+						}
+					}
+				}
+
+				writeTransformFunc(rowBuffer.data(), rowPtr0, mip0.dim.x);
+
+				if (rowIdx1 < mip0.dim.y)
+				{
+					writeTransformFunc(rowBuffer.data() + mip0.dim.x, rowPtr1, mip0.dim.x);
+				}
+			}
+		}, (mip0.dim.y + 2 - 1) / 2);
 	}
 
 	template<typename Callable>

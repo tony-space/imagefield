@@ -1,5 +1,7 @@
 #pragma once
 
+#include <imf/core/GraphNode.hpp>
+
 #include <functional>
 #include <map>
 #include <memory>
@@ -7,8 +9,6 @@
 
 namespace imf::core
 {
-
-class GraphNode;
 
 using graph_node_instantiator_t = std::function<std::shared_ptr<GraphNode>()>;
 void register_graph_node(std::string_view name, graph_node_instantiator_t instantiator);
@@ -34,6 +34,20 @@ template<typename T>
 [[nodiscard]] std::shared_ptr<GraphNode> make_graph_node()
 {
 	return std::make_shared<T>();
+}
+
+template<typename ...Args>
+[[nodiscard]] std::shared_ptr<GraphNode> make_graph_node(std::string_view name, Args&& ...args)
+{
+	auto result = make_graph_node(name);
+
+	assert(sizeof...(Args) <= result->inputNames().size());
+
+	auto rangeIt = result->inputNames().begin();
+
+	(result->setInput(*(rangeIt++), std::forward<Args>(args)), ...);
+
+	return result;
 }
 
 }

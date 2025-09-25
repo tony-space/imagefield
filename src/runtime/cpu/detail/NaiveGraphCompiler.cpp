@@ -390,7 +390,7 @@ NaiveGraphCompiler::FlowInfo& NaiveGraphCompiler::resolveReference(const core::R
 	{
 		const core::DataFlow* referenceInput = curReferenceNode->inputs().front().get();
 		flowIt = m_flows.find(referenceInput);
-		assert(flowIt->second.usages == 0);
+		assert(flowIt->second.usages >= 0);
 		curReferenceNode = referenceInput->producer().as<core::ReferenceNode>();
 	}
 

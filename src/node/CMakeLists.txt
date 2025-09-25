@@ -13,10 +13,15 @@ set(SRC
 	include/imf/core/node/ReferenceNode.hpp
 
 	detail/BicubicUpscaleNode.cpp
+	detail/BoundingBoxNode.cpp
 	detail/ColorSpaceConvertNode.cpp
+	detail/CropNode.cpp
+	detail/DeltaImageNode.cpp
 	detail/FunctorNode.cpp
 	detail/GaussianBlurNode.cpp
+	detail/PeakSignalToNoiseRatioNode.cpp
 	detail/ReferenceNode.cpp
+	detail/TextureFormatConvertNode.cpp 
 	detail/TransformNode.cpp
 )
 

@@ -1,4 +1,4 @@
-
+#include <imf/core/ThreadPool.hpp>
 #include <imf/core/pixel_transform.hpp>
 #include <imf/core/vector_cast.hpp>
 
@@ -72,11 +72,18 @@ ImageSize calc_image_size(TextureFormat format, glm::uvec3 dim, std::size_t rowA
 	return { pixelByteSize, rowByteSize, planeByteSize, volumeByteSize };
 }
 
-void convert_pixels(const TextureData& source, TextureFormat dstFormat, std::size_t dstRowAlignment, std::size_t dstPlaneAlignment, void* dstLocation, std::size_t dstBytesSize)
+void convert_pixels(const TextureData& source, TextureData dest)
 {
-	if (source.data == nullptr || dstLocation == nullptr)
+	assert(source.data && dest.data);
+	if (source.data == nullptr || dest.data == nullptr)
 	{
-		throw std::invalid_argument("image cannot be nullptr");
+		throw std::invalid_argument("images cannot be nullptr");
+	}
+
+	assert(source.dim == dest.dim);
+	if (source.dim != dest.dim)
+	{
+		throw std::invalid_argument("images' dimensions must match");
 	}
 
 	const auto srcSize = calc_image_size(source.format, source.dim, source.rowAlignment, source.planeAlignment);
@@ -86,14 +93,14 @@ void convert_pixels(const TextureData& source, TextureFormat dstFormat, std::siz
 		throw std::runtime_error("invalid source image data size");
 	}
 
-	const auto dstSize = calc_image_size(dstFormat, source.dim, dstRowAlignment, dstPlaneAlignment);
+	const auto dstSize = calc_image_size(dest.format, dest.dim, dest.rowAlignment, dest.planeAlignment);
 
-	if (dstSize.volumeByteSize == 0 || dstBytesSize < dstSize.volumeByteSize)
+	if (dstSize.volumeByteSize == 0)
 	{
 		throw std::runtime_error("invalid destination image data size");
 	}
 
-	TransformRowFunc transformRow = get_convert_func(source.format, dstFormat);
+	TransformRowFunc transformRow = get_convert_func(source.format, dest.format);
 
 	for (size_t plane = 0; plane < source.dim.z; ++plane)
 	{
@@ -104,9 +111,56 @@ void convert_pixels(const TextureData& source, TextureFormat dstFormat, std::siz
 		{
 			const auto srcRowOffset = srcPlaneOffset + row * srcSize.rowByteSize;
 			const auto dstRowOffset = dstPlaneOffset + row * dstSize.rowByteSize;
-			transformRow(static_cast<const uint8_t*>(source.data) + srcRowOffset, static_cast<uint8_t*>(dstLocation) + dstRowOffset, source.dim.x);
+			transformRow(static_cast<const uint8_t*>(source.data) + srcRowOffset, static_cast<uint8_t*>(dest.data) + dstRowOffset, source.dim.x);
 		}
 	}
+}
+
+void convert_pixels(ThreadPool& pool, const TextureData& source, TextureData dest)
+{
+	assert(source.data && dest.data);
+	if (source.data == nullptr || dest.data == nullptr)
+	{
+		throw std::invalid_argument("images cannot be nullptr");
+	}
+
+	assert(source.dim == dest.dim);
+	if (source.dim != dest.dim)
+	{
+		throw std::invalid_argument("images' dimensions must match");
+	}
+
+	const auto srcSize = calc_image_size(source.format, source.dim, source.rowAlignment, source.planeAlignment);
+
+	if (srcSize.volumeByteSize == 0)
+	{
+		throw std::runtime_error("invalid source image data size");
+	}
+
+	const auto dstSize = calc_image_size(dest.format, dest.dim, dest.rowAlignment, dest.planeAlignment);
+
+	if (dstSize.volumeByteSize == 0)
+	{
+		throw std::runtime_error("invalid destination image data size");
+	}
+
+	TransformRowFunc transformRow = get_convert_func(source.format, dest.format);
+
+	pool.forEachSync([&](unsigned from, unsigned to)
+	{
+		for (size_t plane = 0; plane < source.dim.z; ++plane)
+		{
+			const auto srcPlaneOffset = plane * srcSize.planeByteSize;
+			const auto dstPlaneOffset = plane * dstSize.planeByteSize;
+
+			for (size_t row = from; row != to; ++row)
+			{
+				const auto srcRowOffset = srcPlaneOffset + row * srcSize.rowByteSize;
+				const auto dstRowOffset = dstPlaneOffset + row * dstSize.rowByteSize;
+				transformRow(static_cast<const uint8_t*>(source.data) + srcRowOffset, static_cast<uint8_t*>(dest.data) + dstRowOffset, source.dim.x);
+			}
+		}
+	}, source.dim.y);
 }
 
 }

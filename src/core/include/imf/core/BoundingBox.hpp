@@ -161,21 +161,28 @@ public:
 			m_max + delta
 		};
 	}
+
+	[[nodiscard]] constexpr BoundingBox union_(const BoundingBox& other) const noexcept
+	{
+		BoundingBox result;
+		result.m_min = glm::min(m_min, other.m_min);
+		result.m_max = glm::max(m_max, other.m_max);
+		return result;
+	}
 	
 	[[nodiscard]] static glm::vec2 transform(const glm::mat3& homogenousMat, glm::vec2 v)
 	{
-		const auto p = homogenousMat * glm::vec3(v, 1.0f);
-		v = glm::vec2(p.x / p.z, p.y / p.z);
+		v = projectToPlane(homogenousMat, v);
 		v = glm::round(v * kPrecision) * kEpsilon;
 		return v;
 	}
 
-	[[nodiscard]] static BoundingBox fromOrigin(glm::vec2 origin, glm::uvec2 size)
+	[[nodiscard]] static BoundingBox fromOrigin(glm::vec2 origin, glm::vec2 size)
 	{
 		return BoundingBox
 		{
 			origin,
-			origin + glm::vec2(size)
+			origin + size
 		};
 	}
 

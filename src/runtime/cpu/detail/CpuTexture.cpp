@@ -13,11 +13,14 @@ CpuTexture::CpuTexture(const core::TextureData& hostData, core::TextureFormat de
 	core::convert_pixels
 	(
 		hostData,
-		deviceFormat,
-		kRowAlignment,
-		kPlaneAlignment,
-		m_mipMaps.front().storage.get(),
-		m_mipMaps.front().size.volumeByteSize
+		core::TextureData
+		{
+			deviceFormat,
+			hostData.dim,
+			kRowAlignment,
+			kPlaneAlignment,
+			m_mipMaps.front().storage.get(),
+		}
 	);
 }
 
@@ -197,6 +200,21 @@ void CpuTexture::msaaResolve(core::ThreadPool& pool)
 	m_mipMaps.emplace_back(downsample(pool, m_msaa4x));
 
 	m_msaa4x = MipLevel();
+}
+
+std::shared_ptr<CpuTexture> CpuTexture::make(const core::TextureData& hostData, core::TextureFormat deviceFormat)
+{
+	return std::make_shared<CpuTexture>(hostData, deviceFormat);
+}
+
+std::shared_ptr<CpuTexture> CpuTexture::make(glm::uvec3 dim, core::TextureFormat deviceFormat)
+{
+	return std::make_shared<CpuTexture>(dim, deviceFormat);
+}
+
+std::shared_ptr<CpuTexture> CpuTexture::make(glm::uvec2 dim, core::TextureFormat deviceFormat)
+{
+	return std::make_shared<CpuTexture>(dim, deviceFormat);
 }
 
 }

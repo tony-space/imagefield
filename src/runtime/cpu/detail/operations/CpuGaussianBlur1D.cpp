@@ -2,6 +2,8 @@
 #include <imf/runtime/cpu/CpuSampler.hpp>
 #include <imf/runtime/cpu/Rasterizer.hpp>
 
+#include <imf/core/log.hpp>
+
 #include <boost/container/small_vector.hpp>
 
 #include <numeric>
@@ -58,6 +60,8 @@ public:
 
 	virtual void execute(core::EvaluationContext& context) override
 	{
+		core::log::info("cpu") << "Executing CpuGaussianBlur1D";
+
 		const auto image = core::fetch_operand<core::Image>(context, m_image);
 		const auto kernelRadius = core::fetch_operand<unsigned>(context, m_kernelRadius);
 		const auto horizontal = core::fetch_operand<bool>(context, m_horizontal);
@@ -78,13 +82,13 @@ public:
 		const auto sampler = CpuSampler(m_runtime, bakedImage, samplerDesc);
 
 		const auto targetBox = bakedImage.boundingBox().expand(horizontal ? glm::vec2(kernelRadius, 0u) : glm::vec2(0u, kernelRadius));
-		auto targetTexture = std::make_shared<CpuTexture>(targetBox.textureSize(), m_runtime.workingFormat());
+		auto targetTexture = CpuTexture::make(targetBox.textureSize(), m_runtime.workingFormat());
 		auto targetRegion = core::Region::make(core::BoundingBox(1.0f, 1.0f));
 		auto targetMat = core::Image::calcUvToWorldMat(targetBox);
 
 		const auto step = horizontal ? glm::ivec2(1, 0) : glm::ivec2(0, 1);
 
-		Rasterizer::rasterize(m_runtime.threadPool(), *targetTexture, targetBox, targetRegion->triangles(), targetMat,
+		Rasterizer::rasterizeMSAA(m_runtime.threadPool(), *targetTexture, targetBox, targetRegion->triangles(), targetMat,
 		[&](const glm::mat4x2& pixelPosQuad)
 		{
 			auto it = m_weights.begin();

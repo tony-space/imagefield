@@ -1,6 +1,7 @@
 #include <imf/runtime/cpu/CpuOperationFactory.hpp>
 
 #include <imf/core/DataFlow.hpp>
+#include <imf/core/log.hpp>
 #include <imf/core/node/FunctorNode.hpp>
 
 namespace imf::runtime::cpu
@@ -22,6 +23,8 @@ public:
 
 	virtual void execute(core::EvaluationContext& context) override
 	{
+		core::log::info("cpu") << "Executing CpuFunctor";
+
 		const auto& functor = core::fetch_operand<core::FunctorNode::functor_t>(context, m_inputs[0]);
 
 		functor

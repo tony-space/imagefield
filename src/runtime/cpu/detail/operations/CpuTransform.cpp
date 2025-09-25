@@ -1,5 +1,7 @@
 #include <imf/runtime/cpu/CpuOperationFactory.hpp>
 
+#include <imf/core/log.hpp>
+
 namespace imf::runtime::cpu
 {
 
@@ -17,6 +19,8 @@ public:
 
 	virtual void execute(core::EvaluationContext& context) override
 	{
+		core::log::info("cpu") << "Executing CpuTransform";
+
 		const auto& in = core::fetch_operand<core::Image>(context, m_image);
 		const auto& homogenousMat = core::fetch_operand<glm::mat3>(context, m_matrix);
 

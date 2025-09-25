@@ -32,10 +32,10 @@ public:
 	CpuTexture(glm::uvec3 dim, core::TextureFormat deviceFormat);
 	CpuTexture(glm::uvec2 dim, core::TextureFormat deviceFormat);
 	CpuTexture(const CpuTexture&) = delete;
-	CpuTexture(CpuTexture&&) = default;
+	CpuTexture(CpuTexture&&) = delete;
 
 	CpuTexture& operator=(const CpuTexture&) = delete;
-	CpuTexture& operator=(CpuTexture&&) = default;
+	CpuTexture& operator=(CpuTexture&&) = delete;
 
 	glm::uvec3 dim() const noexcept override;
 	core::TextureFormat format() const noexcept override;
@@ -43,11 +43,18 @@ public:
 	void unmap() const noexcept override;
 	void generateMipMaps(core::ThreadPool& pool);
 	MipLevel downsample(core::ThreadPool& pool, const MipLevel& inLevel) const;
+
+	// TODO
+	// return TextureData instead of MipLevel
 	const MipLevel& at(unsigned level) const;
 	const MipLevel& operator[](unsigned level) const noexcept { return m_mipMaps[level]; }
 	
 	MipLevel& getMsaaLevel();
 	void msaaResolve(core::ThreadPool& pool);
+
+	static std::shared_ptr<CpuTexture> make(const core::TextureData& hostData, core::TextureFormat deviceFormat);
+	static std::shared_ptr<CpuTexture> make(glm::uvec3 dim, core::TextureFormat deviceFormat);
+	static std::shared_ptr<CpuTexture> make(glm::uvec2 dim, core::TextureFormat deviceFormat);
 private:
 	MipLevel m_msaa4x;
 	boost::container::small_vector<MipLevel, 16> m_mipMaps;

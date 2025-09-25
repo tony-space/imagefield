@@ -51,6 +51,9 @@ public:
 	// Polygonal domain of definiton in local coordinate system. Outside the region pixels are black and transparent.
 	[[nodiscard]] const auto& localRegion() const noexcept { return m_localRegion; }
 
+	// Polygonal domain of definiton in world coordinate system. Outside the region pixels are black and transparent.
+	[[nodiscard]] std::shared_ptr<Region> worldRegion() const;
+
 	// Bounding box in world space. Consider using localRegion()->boundingBox() for local space bounding box.
 	[[nodiscard]] const auto& boundingBox() const noexcept { return m_boundingBox; }
 

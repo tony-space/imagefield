@@ -29,12 +29,7 @@ runtime_instantiator_t make_cpu_runtime = [](const IRuntime::init_config_t& conf
 namespace imf::runtime::cpu
 {
 
-CpuRuntime::CpuRuntime(const core::IRuntime::init_config_t&)
-{
-	core::log::info("runtime") << "cpu runtime initialized";
-}
-
-std::vector<std::uint8_t> CpuRuntime::fetchContent(const std::filesystem::path& path)
+static std::vector<std::uint8_t> fetchContent(const std::filesystem::path& path)
 {
 	core::log::info("runtime") << "reading binary content from: " << path.string();
 
@@ -46,6 +41,11 @@ std::vector<std::uint8_t> CpuRuntime::fetchContent(const std::filesystem::path& 
 	}
 
 	return { std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>() };
+}
+
+CpuRuntime::CpuRuntime(const core::IRuntime::init_config_t&)
+{
+	core::log::info("runtime") << "cpu runtime initialized";
 }
 
 std::shared_ptr<core::IGraphCompiler> CpuRuntime::compiler()
@@ -102,7 +102,18 @@ void CpuRuntime::saveImage(core::Image image, const std::filesystem::path& path)
 		const auto dstSize = core::calc_image_size(core::TextureFormat::RGBA8, deviceData.dim, kAlignment, 1);
 		auto result = std::vector<uint8_t>(dstSize.volumeByteSize);
 
-		convert_pixels(deviceData, core::TextureFormat::RGBA8, kAlignment, 1, result.data(), dstSize.volumeByteSize);
+		convert_pixels
+		(
+			deviceData,
+			core::TextureData
+			{
+				core::TextureFormat::RGBA8,
+				deviceData.dim,
+				kAlignment,
+				1,
+				result.data(),
+			}
+		);
 
 		stbi_write_png(path.string().c_str(), (int)deviceData.dim.x, (int)deviceData.dim.y, 4, result.data(), (int)dstSize.rowByteSize);
 	}, 0);
@@ -122,11 +133,11 @@ core::Image CpuRuntime::blit(const core::Image& image, const core::SamplerDesc& 
 		return image;
 	}
 
-	auto targetTexture = std::make_shared<CpuTexture>(targetDim, m_workingFormat);
+	auto targetTexture = std::make_shared<CpuTexture>(targetDim, image.texture()->format());
 
 	const auto sampler = CpuSampler(*this, image, desc);
 
-	Rasterizer::rasterize(threadPool(), *targetTexture, targetBox, image.localRegion()->triangles(), image.uvToWorldMat(),
+	Rasterizer::rasterizeMSAA(threadPool(), *targetTexture, targetBox, image.localRegion()->triangles(), image.uvToWorldMat(),
 	[&](const glm::mat4x2& pixelQuad)
 	{
 		return sampler.sample(pixelQuad);

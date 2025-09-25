@@ -12,8 +12,13 @@ static std::map<std::string_view, imf::core::graph_node_instantiator_t> register
 	std::map<std::string_view, imf::core::graph_node_instantiator_t> map;
 
 	RegisterType(BicubicUpscaleNode);
+	RegisterType(BoundingBoxNode);
 	RegisterType(ColorSpaceConvertNode);
+	RegisterType(CropNode);
+	RegisterType(DeltaImageNode);
 	RegisterType(GaussianBlurNode);
+	RegisterType(PeakSignalToNoiseRatioNode);
+	RegisterType(TextureFormatConvertNode);
 	RegisterType(TransformNode);
 
 	return map;

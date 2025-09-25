@@ -84,6 +84,13 @@ glm::mat3 Image::calcUvToWorldMat(const BoundingBox& box) noexcept
 
 }
 
+std::shared_ptr<Region> Image::worldRegion() const
+{
+	auto copy = m_localRegion->copy();
+	copy->transformPoints(m_uvToWorldMat);
+	return copy;
+}
+
 Image Image::transformed(const glm::mat3& homogenousMatrix) const
 {
 	auto resultBox = BoundingBox{};

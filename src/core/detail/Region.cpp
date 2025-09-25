@@ -60,15 +60,22 @@ public:
 	using multi_polygon_t = boost::geometry::model::multi_polygon<polygon_t>;
 	using linestring_t = boost::geometry::model::linestring<glm::vec2>;
 
+	RegionImpl(multi_polygon_t multiPolygon);
 	RegionImpl(const BoundingBox&);
 	RegionImpl(const RegionImpl&) = default;
 	RegionImpl(RegionImpl&&) noexcept = default;
+	
+	std::shared_ptr<Region> copy() const override;
 
 	const Triangulation& triangles() const override;
 	const BoundingBox& boundingBox() const noexcept override;
 	bool empty() const noexcept override;
 	operator bool() const noexcept override;
 	bool trivialRectangle() const noexcept override;
+	void transformPoints(const glm::mat3& homogenousMat) noexcept override;
+
+	friend std::shared_ptr<Region> region_difference(const Region& lhs, const Region& rhs);
+	friend std::shared_ptr<Region> region_intersection(const Region& lhs, const Region& rhs);
 
 private:
 	bool anyOfPointsImpl(bool(*pFn)(const void* ctx, const glm::vec2&), const void* ctx) const override;
@@ -77,6 +84,11 @@ private:
 	mutable std::optional<BoundingBox> m_cachedBox;
 	mutable std::optional<Triangulation> m_cachedTriangulation;
 };
+
+RegionImpl::RegionImpl(multi_polygon_t multiPolygon) : m_multiPolygon(std::move(multiPolygon))
+{
+
+}
 
 RegionImpl::RegionImpl(const BoundingBox& box)
 {
@@ -101,6 +113,11 @@ RegionImpl::RegionImpl(const BoundingBox& box)
 		polygon_t { points }
 	};
 	m_cachedBox = box;
+}
+
+std::shared_ptr<Region> RegionImpl::copy() const
+{
+	return std::make_shared<RegionImpl>(m_multiPolygon);
 }
 
 const Region::Triangulation& RegionImpl::triangles() const
@@ -206,6 +223,19 @@ bool RegionImpl::trivialRectangle() const noexcept
 	return true;
 }
 
+void RegionImpl::transformPoints(const glm::mat3& homogenousMat) noexcept
+{
+	m_cachedBox.reset();
+	m_cachedTriangulation.reset();
+
+	boost::geometry::for_each_point(m_multiPolygon, [&](glm::vec2& v)
+	{
+		v = BoundingBox::transform(homogenousMat, v);
+	});
+
+	boost::geometry::correct(m_multiPolygon);
+}
+
 bool RegionImpl::anyOfPointsImpl(bool(*pFn)(const void* ctx, const glm::vec2&), const void* ctx) const
 {
 	for (const auto& polygon : m_multiPolygon)
@@ -238,40 +268,32 @@ std::shared_ptr<Region> Region::make(const BoundingBox& box)
 	return std::make_shared<RegionImpl>(box);
 }
 
-//Region shape_difference(const Region& lhs, const Region& rhs)
-//{
-//	Region::multi_polygon_t result;
-//
-//	boost::geometry::difference(lhs.m_multiPolygon, rhs.m_multiPolygon, result);
-//
-//	return { std::move(result) };
-//}
-//
-//Region shape_intersection(const Region& lhs, const Region& rhs)
-//{
-//	Region::multi_polygon_t result;
-//
-//	boost::geometry::intersection(lhs.m_multiPolygon, rhs.m_multiPolygon, result);
-//
-//	return { std::move(result) };
-//}
-//
-//Region shape_symmetric_difference(const Region& lhs, const Region& rhs)
-//{
-//	Region::multi_polygon_t result;
-//
-//	boost::geometry::sym_difference(lhs.m_multiPolygon, rhs.m_multiPolygon, result);
-//
-//	return { std::move(result) };
-//}
-//
-//Region shape_union(const Region& lhs, const Region& rhs)
-//{
-//	Region::multi_polygon_t result;
-//
-//	boost::geometry::union_(lhs.m_multiPolygon, rhs.m_multiPolygon, result);
-//
-//	return { std::move(result) };
-//}
+std::shared_ptr<Region> region_difference(const Region& lhs, const Region& rhs)
+{
+	RegionImpl::multi_polygon_t result;
+
+	boost::geometry::difference(static_cast<const RegionImpl&>(lhs).m_multiPolygon, static_cast<const RegionImpl&>(rhs).m_multiPolygon, result);
+
+	if (result.empty())
+	{
+		return nullptr;
+	}
+
+	return std::make_shared<RegionImpl>(std::move(result));
+}
+
+std::shared_ptr<Region> region_intersection(const Region& lhs, const Region& rhs)
+{
+	RegionImpl::multi_polygon_t result;
+
+	boost::geometry::intersection(static_cast<const RegionImpl&>(lhs).m_multiPolygon, static_cast<const RegionImpl&>(rhs).m_multiPolygon, result);
+
+	if (result.empty())
+	{
+		return nullptr;
+	}
+
+	return std::make_shared<RegionImpl>(std::move(result));
+}
 
 }

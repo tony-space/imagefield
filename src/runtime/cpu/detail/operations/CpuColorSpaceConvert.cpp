@@ -3,6 +3,7 @@
 #include <imf/runtime/cpu/Rasterizer.hpp>
 
 #include <imf/core/ColorSpace.hpp>
+#include <imf/core/log.hpp>
 
 namespace imf::runtime::cpu
 {
@@ -23,6 +24,8 @@ public:
 
 	virtual void execute(core::EvaluationContext& context) override
 	{
+		core::log::info("cpu") << "Executing CpuColorSpaceConvert";
+
 		const auto& image = core::fetch_operand<core::Image>(context, m_image);
 		const auto& sourceColorSpace = core::fetch_operand<core::color::ColorSpace>(context, m_sourceColorSpace);
 		const auto& targetColorSpace = core::fetch_operand<core::color::ColorSpace>(context, m_targetColorSpace);
@@ -33,7 +36,7 @@ public:
 
 		const auto& targetBox = image.boundingBox();
 		const auto targetDim = targetBox.textureSize();
-		auto targetTexture = std::make_shared<CpuTexture>(targetDim, m_runtime.workingFormat());
+		auto targetTexture = CpuTexture::make(targetDim, m_runtime.workingFormat());
 
 		const auto sampler = CpuSampler(m_runtime, image);
 
@@ -49,8 +52,6 @@ public:
 
 			return pixelQuad;
 		});
-
-		targetTexture->msaaResolve(m_runtime.threadPool());
 
 		context.set(m_dst.location, core::Image
 		(

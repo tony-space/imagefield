@@ -57,7 +57,7 @@ private:
 	{
 		using variant_t = std::variant<core::source_operand::runtime_value_location_t, core::source_operand::compile_time_value_t>;
 		variant_t variant{ core::EvaluationContext::element_id_t{} };
-		std::size_t usages{ 0 };
+		int usages{ 0 };
 
 		constexpr bool constant() const noexcept
 		{

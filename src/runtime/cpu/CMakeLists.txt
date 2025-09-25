@@ -18,10 +18,15 @@ set(SRC
 	detail/NaiveGraphCompiler.hpp
 
 	detail/operations/CpuBicubicUpscale.cpp
+	detail/operations/CpuBoundingBox.cpp
 	detail/operations/CpuColorSpaceConvert.cpp
+	detail/operations/CpuCrop.cpp
+	detail/operations/CpuDeltaImage.cpp
 	detail/operations/CpuFunctor.cpp
 	detail/operations/CpuGaussianBlur1D.cpp
 	detail/operations/CpuMove.cpp
+	detail/operations/CpuPeakSignalToNoiseRatio.cpp
+	detail/operations/CpuTextureFormatConvert.cpp
 	detail/operations/CpuTransform.cpp
 )
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SRC})

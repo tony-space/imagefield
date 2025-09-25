@@ -7,6 +7,8 @@
 namespace imf::core
 {
 
+class ThreadPool;
+
 constexpr inline std::size_t texture_pixel_size(TextureFormat format)
 {
 	switch (format)
@@ -42,6 +44,7 @@ TransformRowFunc get_convert_func(TextureFormat from, TextureFormat to);
 
 ImageSize calc_image_size(TextureFormat format, glm::uvec3 dim, std::size_t rowAlignment, std::size_t planeAlignment);
 
-void convert_pixels(const TextureData& source, TextureFormat dstFormat, std::size_t dstRowAlignment, std::size_t dstPlaneAlignment, void* dstLocation, std::size_t dstBytesSize);
+void convert_pixels(const TextureData& source, TextureData dest);
+void convert_pixels(ThreadPool& pool, const TextureData& source, TextureData dest);
 
 }

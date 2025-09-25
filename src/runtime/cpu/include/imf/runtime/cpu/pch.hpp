@@ -11,6 +11,7 @@
 
 #include <boost/container/small_vector.hpp>
 
+#include <atomic>
 #include <fstream>
 #include <numeric>
 #include <queue>

@@ -4,11 +4,12 @@
 #include <imf/core/node/PlaceholderNode.hpp>
 #include <imf/core/node/FunctorNode.hpp>
 
-#include <imf/core/Image.hpp>
 #include <imf/core/glm.hpp>
 
 namespace imf::core
 {
+
+class Image;
 
 class GaussianBlur1DNode final : public GraphNodeBase<GaussianBlur1DNode, 3>
 {

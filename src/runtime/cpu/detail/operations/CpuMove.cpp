@@ -1,5 +1,7 @@
 #include <imf/runtime/cpu/CpuOperationFactory.hpp>
 
+#include <imf/core/log.hpp>
+
 namespace imf::runtime::cpu
 {
 
@@ -15,6 +17,8 @@ public:
 	}
 	virtual void execute(core::EvaluationContext& evalCtx) override
 	{
+		core::log::info("cpu") << "Executing CpuMove";
+
 		evalCtx.set(m_dst.location, core::fetch_operand(evalCtx, m_src));
 	}
 protected:

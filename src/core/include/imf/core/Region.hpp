@@ -22,6 +22,7 @@ public:
 	};
 
 	virtual ~Region() = default;
+	virtual std::shared_ptr<Region> copy() const = 0;
 
 	virtual const Triangulation& triangles() const = 0;
 	virtual const BoundingBox& boundingBox() const noexcept = 0;
@@ -29,6 +30,7 @@ public:
 	virtual bool empty() const noexcept = 0;
 	virtual operator bool() const noexcept = 0;
 	virtual bool trivialRectangle() const noexcept = 0;
+	virtual void transformPoints(const glm::mat3& homogenousMat) noexcept = 0;
 
 	template<typename Func>
 	bool anyOfPoints(const Func& func) const
@@ -51,19 +53,12 @@ public:
 		});
 	}
 
-	//friend Region shape_difference(const Region& lhs, const Region& rhs);
-	//friend Region shape_intersection(const Region& lhs, const Region& rhs);
-	//friend Region shape_symmetric_difference(const Region& lhs, const Region& rhs);
-	//friend Region shape_union(const Region& lhs, const Region& rhs);
-
 	static std::shared_ptr<Region> make(const BoundingBox&);
 private:
 	virtual bool anyOfPointsImpl(bool(*pFn)(const void* ctx, const glm::vec2&), const void* ctx) const = 0;
 };
 
-//Region shape_difference(const Region& lhs, const Region& rhs);
-//Region shape_intersection(const Region& lhs, const Region& rhs);
-//Region shape_symmetric_difference(const Region& lhs, const Region& rhs);
-//Region shape_union(const Region& lhs, const Region& rhs);
+std::shared_ptr<Region> region_difference(const Region& lhs, const Region& rhs);
+std::shared_ptr<Region> region_intersection(const Region& lhs, const Region& rhs);
 
 }

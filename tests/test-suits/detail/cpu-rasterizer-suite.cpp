@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(OnePixelImage)
 
 	auto image = core::Image
 	(
-		std::make_shared<cpu::CpuTexture>(hostTextureData, core::TextureFormat::RGBA32F),
+		cpu::CpuTexture::make(hostTextureData, core::TextureFormat::RGBA32F),
 		core::BoundingBox(1.0f, 1.0f)
 	);
 
